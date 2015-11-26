@@ -37,6 +37,11 @@ namespace OxPt
         [Fact]
         public void SW001_Simple()
         {
+            var boldFont = new Sw.CellStyleFont { Bold = true };
+            var boldCellStyle = new Sw.CellStyleDfn { Font = boldFont };
+            var boldAndLeftCellStyle = new Sw.CellStyleDfn { Font = boldFont, HorizontalCellAlignment = Sw.HorizontalCellAlignment.Left };
+            var format0_00 = new Sw.CellStyleNumFmt { formatCode = "0.00" };
+            var numCellStyle = new Sw.CellStyleDfn { NumFmt = format0_00 };
             Sw.WorkbookDfn wb = new Sw.WorkbookDfn
             {
                 Worksheets = new Sw.WorksheetDfn[]
@@ -50,19 +55,17 @@ namespace OxPt
                             new Sw.CellDfn
                             {
                                 Value = "Name",
-                                Bold = true,
+                                Style = boldCellStyle,
                             },
                             new Sw.CellDfn
                             {
                                 Value = "Age",
-                                Bold = true,
-                                HorizontalCellAlignment = Sw.HorizontalCellAlignment.Left,
+                                Style = boldAndLeftCellStyle,
                             },
                             new Sw.CellDfn
                             {
                                 Value = "Rate",
-                                Bold = true,
-                                HorizontalCellAlignment = Sw.HorizontalCellAlignment.Left,
+                                Style = boldAndLeftCellStyle,
                             }
                         },
                         Rows = new Sw.RowDfn[]
@@ -82,7 +85,7 @@ namespace OxPt
                                     new Sw.CellDfn {
                                         CellDataType = Sw.CellDataType.Number,
                                         Value = (decimal)45.00,
-                                        FormatCode = "0.00",
+                                        Style = numCellStyle,
                                     },
                                 }
                             },
@@ -101,7 +104,7 @@ namespace OxPt
                                     new Sw.CellDfn {
                                         CellDataType = Sw.CellDataType.Number,
                                         Value = (decimal)78.00,
-                                        FormatCode = "0.00",
+                                        Style = numCellStyle,
                                     },
                                 }
                             },
@@ -117,6 +120,13 @@ namespace OxPt
         [Fact]
         public void SW002_AllDataTypes()
         {
+            var boldFont = new Sw.CellStyleFont { Bold = true };
+            var boldCellStyle = new Sw.CellStyleDfn { Font = boldFont };
+            var boldAndRightCellStyle = new Sw.CellStyleDfn { Font = boldFont, HorizontalCellAlignment = Sw.HorizontalCellAlignment.Right };
+            var rightCellStyle = new Sw.CellStyleDfn { HorizontalCellAlignment = Sw.HorizontalCellAlignment.Right };
+            var formatMMDDYY = new Sw.CellStyleNumFmt { formatCode = "mm-dd-yy" };
+            var dateCellStyle = new Sw.CellStyleDfn { NumFmt = formatMMDDYY };
+            var dateAndBoldCellStyle = new Sw.CellStyleDfn { Font = boldFont, NumFmt = formatMMDDYY, HorizontalCellAlignment = Sw.HorizontalCellAlignment.Center };
             Sw.WorkbookDfn wb = new Sw.WorkbookDfn
             {
                 Worksheets = new Sw.WorksheetDfn[]
@@ -129,13 +139,12 @@ namespace OxPt
                             new Sw.CellDfn
                             {
                                 Value = "DataType",
-                                Bold = true,
+                                Style = boldCellStyle,
                             },
                             new Sw.CellDfn
                             {
                                 Value = "Value",
-                                Bold = true,
-                                HorizontalCellAlignment = Sw.HorizontalCellAlignment.Right,
+                                Style = boldAndRightCellStyle,
                             },
                         },
                         Rows = new Sw.RowDfn[]
@@ -179,7 +188,7 @@ namespace OxPt
                                     new Sw.CellDfn {
                                         CellDataType = Sw.CellDataType.String,
                                         Value = "A String",
-                                        HorizontalCellAlignment = Sw.HorizontalCellAlignment.Right,
+                                        Style = rightCellStyle,
                                     },
                                 }
                             },
@@ -302,14 +311,12 @@ namespace OxPt
                                     new Sw.CellDfn {
                                         CellDataType = Sw.CellDataType.Date,
                                         Value = new DateTime(2012, 1, 8),
-                                        FormatCode = "mm-dd-yy",
+                                        Style = dateCellStyle,
                                     },
                                     new Sw.CellDfn {
                                         CellDataType = Sw.CellDataType.Date,
                                         Value = new DateTime(2012, 1, 9),
-                                        FormatCode = "mm-dd-yy",
-                                        Bold = true,
-                                        HorizontalCellAlignment = Sw.HorizontalCellAlignment.Center,
+                                        Style = dateAndBoldCellStyle,
                                     },
                                 }
                             },

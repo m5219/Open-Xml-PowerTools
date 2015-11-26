@@ -18,6 +18,11 @@ namespace SpreadsheetWriterExample
             var tempDi = new DirectoryInfo(string.Format("ExampleOutput-{0:00}-{1:00}-{2:00}-{3:00}{4:00}{5:00}", n.Year - 2000, n.Month, n.Day, n.Hour, n.Minute, n.Second));
             tempDi.Create();
 
+            var boldFont = new CellStyleFont { Bold = true };
+            var boldCellStyle = new CellStyleDfn { Font = boldFont };
+            var boldAndLeftCellStyle = new CellStyleDfn { Font = boldFont, HorizontalCellAlignment = HorizontalCellAlignment.Left };
+            var format0_00 = new CellStyleNumFmt { formatCode = "0.00" };
+            var numCellStyle = new CellStyleDfn { NumFmt = format0_00 };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]
@@ -31,19 +36,17 @@ namespace SpreadsheetWriterExample
                             new CellDfn
                             {
                                 Value = "Name",
-                                Bold = true,
+                                Style = boldCellStyle
                             },
                             new CellDfn
                             {
                                 Value = "Age",
-                                Bold = true,
-                                HorizontalCellAlignment = HorizontalCellAlignment.Left,
+                                Style = boldAndLeftCellStyle,
                             },
                             new CellDfn
                             {
                                 Value = "Rate",
-                                Bold = true,
-                                HorizontalCellAlignment = HorizontalCellAlignment.Left,
+                                Style = boldAndLeftCellStyle,
                             }
                         },
                         Rows = new RowDfn[]
@@ -63,7 +66,7 @@ namespace SpreadsheetWriterExample
                                     new CellDfn {
                                         CellDataType = CellDataType.Number,
                                         Value = (decimal)45.00,
-                                        FormatCode = "0.00",
+                                        Style = numCellStyle,
                                     },
                                 }
                             },
@@ -82,7 +85,7 @@ namespace SpreadsheetWriterExample
                                     new CellDfn {
                                         CellDataType = CellDataType.Number,
                                         Value = (decimal)78.00,
-                                        FormatCode = "0.00",
+                                        Style = numCellStyle,
                                     },
                                 }
                             },

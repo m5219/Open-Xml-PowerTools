@@ -95,10 +95,7 @@ namespace OpenXmlPowerTools
         };
         public object Value;
         public CellDataType? CellDataType;
-        public HorizontalCellAlignment? HorizontalCellAlignment;
-        public bool? Bold;
-        public bool? Italic;
-        public string FormatCode;
+        public CellStyleDfn Style;
     }
 
     public enum HorizontalCellAlignment
@@ -378,10 +375,7 @@ namespace OpenXmlPowerTools
                     xw.WriteStartAttribute("r");
                     xw.WriteValue(SpreadsheetMLUtil.IntToColumnId(cellCount) + rowCount.ToString());
                     xw.WriteEndAttribute();
-                    if (cell.Bold != null ||
-                        cell.Italic != null ||
-                        cell.FormatCode != null ||
-                        cell.HorizontalCellAlignment != null)
+                    if (cell.Style != null)
                     {
                         xw.WriteStartAttribute("s");
                         xw.WriteValue(GetCellStyle(sDoc, cell));
@@ -431,22 +425,15 @@ namespace OpenXmlPowerTools
 
         private static int GetCellStyle(SpreadsheetDocument sDoc, CellDfn cell)
         {
-            XDocument sXDoc = sDoc.WorkbookPart.WorkbookStylesPart.GetXDocument();
-            var match = sXDoc
-                .Root
-                .Element(S.cellXfs)
-                .Elements(S.xf)
-                .Select((e, i) => new
-                {
-                    Element = e,
-                    Index = i,
-                })
-                .FirstOrDefault(xf => CompareStyles(sXDoc, xf.Element, cell));
-            if (match != null)
-                return match.Index;
+            if (cell.Style.id != null)
+            {
+                return (int)cell.Style.id;
+            }
 
             // if no match, then create a style
+            XDocument sXDoc = sDoc.WorkbookPart.WorkbookStylesPart.GetXDocument();
             int newId = CreateNewStyle(sXDoc, cell, sDoc);
+            cell.Style.id = newId;
             return newId;
         }
 
@@ -454,33 +441,25 @@ namespace OpenXmlPowerTools
         {
             XAttribute applyFont = null;
             XAttribute fontId = null;
-            if (cell.Bold == true || cell.Italic == true)
+            if (cell.Style.Font != null)
             {
                 applyFont = new XAttribute(SSNoNamespace.applyFont, 1);
-                fontId = new XAttribute(SSNoNamespace.fontId, GetFontId(sXDoc, cell));
+                fontId = new XAttribute(SSNoNamespace.fontId, GetFontId(sXDoc, cell.Style.Font));
             }
             XAttribute applyAlignment = null;
             XElement alignment = null;
-            if (cell.HorizontalCellAlignment != null)
+            if (cell.Style.HorizontalCellAlignment != null)
             {
                 applyAlignment = new XAttribute(SSNoNamespace.applyAlignment, 1);
                 alignment = new XElement(S.alignment,
-                    new XAttribute(SSNoNamespace.horizontal, cell.HorizontalCellAlignment.ToString().ToLower()));
+                    new XAttribute(SSNoNamespace.horizontal, cell.Style.HorizontalCellAlignment.ToString().ToLower()));
             }
             XAttribute applyNumberFormat = null;
             XAttribute numFmtId = null;
-            if (cell.FormatCode != null)
+            if (cell.Style.NumFmt != null)
             {
-                if (CellDfn.StandardFormats.ContainsKey(cell.FormatCode))
-                {
-                    applyNumberFormat = new XAttribute(SSNoNamespace.applyNumberFormat, 1);
-                    numFmtId = new XAttribute(SSNoNamespace.numFmtId, CellDfn.StandardFormats[cell.FormatCode]);
-                }
-                else
-                {
-                    applyNumberFormat = new XAttribute(SSNoNamespace.applyNumberFormat, 1);
-                    numFmtId = new XAttribute(SSNoNamespace.numFmtId, GetNumFmtId(sXDoc, cell.FormatCode));
-                }
+                applyNumberFormat = new XAttribute(SSNoNamespace.applyNumberFormat, 1);
+                numFmtId = new XAttribute(SSNoNamespace.numFmtId, GetNumFmtId(sXDoc, cell.Style.NumFmt));
             }
             XElement newXf = new XElement(S.xf,
                 applyFont,
@@ -508,30 +487,43 @@ namespace OpenXmlPowerTools
             }
         }
 
-        private static int GetFontId(XDocument sXDoc, CellDfn cell)
+        private static int GetFontId(XDocument sXDoc, CellStyleFont style)
         {
             XElement fonts = sXDoc.Root.Element(S.fonts);
             if (fonts == null)
             {
                 fonts = new XElement(S.fonts,
                     new XAttribute(SSNoNamespace.count, 1),
-                    new XElement(S.font,
-                        cell.Bold == true ? new XElement(S.b) : null,
-                        cell.Italic == true ? new XElement(S.i) : null));
+                    style.ToXElement());
                 sXDoc.Root.Add(fonts);
+                style.id = 0;
                 return 0;
             }
-            XElement font = new XElement(S.font,
-                cell.Bold == true ? new XElement(S.b) : null,
-                cell.Italic == true ? new XElement(S.i) : null);
+            if (style.id != null)
+            {
+                return (int)style.id;
+            }
+            XElement font = style.ToXElement();
             fonts.Add(font);
             int count = (int)fonts.Attribute(SSNoNamespace.count);
             fonts.SetAttributeValue(SSNoNamespace.count, count + 1);
+            style.id = count;
             return count;
         }
 
-        private static int GetNumFmtId(XDocument sXDoc, string formatCode)
+        private static int GetNumFmtId(XDocument sXDoc, CellStyleNumFmt style)
         {
+            if (style.id != null)
+            {
+                return (int)style.id;
+            }
+            string formatCode = style.formatCode;
+            if (CellDfn.StandardFormats.ContainsKey(formatCode))
+            {
+                style.id = CellDfn.StandardFormats[formatCode];
+                return (int)style.id;
+            }
+
             int xfNumber = 81;
             while (true)
             {
@@ -543,102 +535,19 @@ namespace OpenXmlPowerTools
                     break;
                 ++xfNumber;
             }
+            style.id = xfNumber;
             XElement numFmts = sXDoc.Root.Element(S.numFmts);
             if (numFmts == null)
             {
                 numFmts = new XElement(S.numFmts,
                     new XAttribute(SSNoNamespace.count, 1),
-                    new XElement(S.numFmt,
-                        new XAttribute(SSNoNamespace.numFmtId, xfNumber),
-                        new XAttribute(SSNoNamespace.formatCode, formatCode)));
+                    style.ToXElement());
                 sXDoc.Root.AddFirst(numFmts);
                 return xfNumber;
             }
-            XElement numFmt = new XElement(S.numFmt,
-                new XAttribute(SSNoNamespace.numFmtId, xfNumber),
-                new XAttribute(SSNoNamespace.formatCode, formatCode));
+            XElement numFmt = style.ToXElement();
             numFmts.Add(numFmt);
             return xfNumber;
-        }
-
-        private static bool CompareStyles(XDocument sXDoc, XElement xf, CellDfn cell)
-        {
-            bool matchFont = MatchFont(sXDoc, xf, cell);
-            bool matchAlignment = MatchAlignment(sXDoc, xf, cell);
-            bool matchFormat = MatchFormat(sXDoc, xf, cell);
-            return (matchFont && matchAlignment && matchFormat);
-        }
-
-        private static bool MatchFont(XDocument sXDoc, XElement xf, CellDfn cell)
-        {
-            if (((int?)xf.Attribute(SSNoNamespace.applyFont) == 0 ||
-                xf.Attribute(SSNoNamespace.applyFont) == null) &&
-                (cell.Bold == null || cell.Bold == false) &&
-                (cell.Italic == null || cell.Italic == false))
-                return true;
-            if (((int?)xf.Attribute(SSNoNamespace.applyFont) == 0 ||
-                xf.Attribute(SSNoNamespace.applyFont) == null) &&
-                (cell.Bold == true ||
-                 cell.Italic == true))
-                return false;
-            int fontId = (int)xf.Attribute(SSNoNamespace.fontId);
-            XElement font = sXDoc
-                .Root
-                .Element(S.fonts)
-                .Elements(S.font)
-                .ElementAt(fontId);
-            XElement fabFont = new XElement(S.font,
-                cell.Bold == true ? new XElement(S.b) : null,
-                cell.Italic == true ? new XElement(S.i) : null);
-            bool match = XNode.DeepEquals(font, fabFont);
-            return match;
-        }
-
-        private static bool MatchAlignment(XDocument sXDoc, XElement xf, CellDfn cell)
-        {
-            if ((int?)xf.Attribute(SSNoNamespace.applyAlignment) == 0 ||
-                (xf.Attribute(SSNoNamespace.applyAlignment) == null) &&
-                cell.HorizontalCellAlignment == null)
-                return true;
-            if (xf.Attribute(SSNoNamespace.applyAlignment) == null &&
-                cell.HorizontalCellAlignment != null)
-                return false;
-            string alignment = (string)xf.Element(S.alignment).Attribute(SSNoNamespace.horizontal);
-            bool match = alignment == cell.HorizontalCellAlignment.ToString().ToLower();
-            return match;
-        }
-
-        private static bool MatchFormat(XDocument sXDoc, XElement xf, CellDfn cell)
-        {
-            if ((int?)xf.Attribute(SSNoNamespace.applyNumberFormat) != 1 &&
-                cell.FormatCode == null)
-                return true;
-            if (xf.Attribute(SSNoNamespace.applyNumberFormat) == null &&
-                cell.FormatCode != null)
-                return false;
-            int numFmtId = (int)xf.Attribute(SSNoNamespace.numFmtId);
-            int? nfi = null;
-            if (cell.FormatCode != null)
-            {
-                if (CellDfn.StandardFormats.ContainsKey(cell.FormatCode))
-                    nfi = CellDfn.StandardFormats[cell.FormatCode];
-                if (nfi == numFmtId)
-                    return true;
-            }
-            XElement numFmts = sXDoc
-                .Root
-                .Element(S.numFmts);
-            if (numFmts == null)
-                return false;
-            XElement numFmt = numFmts
-                .Elements(S.numFmt)
-                .FirstOrDefault(numFmtElement =>
-                    (int)numFmtElement.Attribute(SSNoNamespace.numFmtId) == numFmtId);
-            if (numFmt == null)
-                return false;
-            string styleFormatCode = (string)numFmt.Attribute(SSNoNamespace.formatCode);
-            bool match = styleFormatCode == cell.FormatCode;
-            return match;
         }
 
         private static string _EmptyXlsx = @"UEsDBBQABgAIAAAAIQBi7p1oYQEAAJAEAAATAAgCW0NvbnRlbnRfVHlwZXNdLnhtbCCiBAIooAAC
