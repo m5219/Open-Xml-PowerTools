@@ -172,6 +172,61 @@ namespace SpreadsheetWriterExample
                                     },
                                 }
                             },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "size 24",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Size = 24} },
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "red",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Color = "FFFF0000"} },
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "font: Arial",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Name = "Arial"} },
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "font: Times New Roman",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Name = "Times New Roman"} },
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "font: Courier New",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Name = "Courier New"} },
+                                    },
+                                }
+                            },
                         }
                     }
                 }

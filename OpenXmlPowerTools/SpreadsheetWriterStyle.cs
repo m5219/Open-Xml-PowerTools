@@ -78,18 +78,56 @@ namespace OpenXmlPowerTools
     {
         public uint? Size;
         public string Name;
+        public string Color;
         public bool? Bold;
         public bool? Italic;
 
         public XElement ToXElement()
         {
-            //TODO Size
-            //TODO Name
+            XElement xsize = null;
+            if (this.Size != null)
+            {
+                xsize = new XElement(S.sz, new XAttribute(SSNoNamespace.val, this.Size));
+            }
+            XElement xname = null;
+            XElement xfamily = null;
+            if (this.Name != null)
+            {
+                xname = new XElement(S.name, new XAttribute(SSNoNamespace.val, this.Name));
+                xfamily = new XElement(S.family, new XAttribute(SSNoNamespace.val, (int)CellStyleFontFamilyEnum.Swiss));
+            }
+            XElement xcolor = null;
+            if (this.Color != null)
+            {
+                xcolor = new XElement(S.color, new XAttribute(SSNoNamespace.rgb, this.Color));
+            }
+            XElement xbold = null;
+            if (this.Bold == true)
+            {
+                xbold = new XElement(S.b);
+            }
+            XElement xitalic = null;
+            if (this.Italic == true)
+            {
+                xitalic = new XElement(S.i);
+            }
             var result = new XElement(S.font,
-                this.Bold == true ? new XElement(S.b) : null,
-                            this.Italic == true ? new XElement(S.i) : null);
+                xbold,
+                xitalic,
+                xsize,
+                xcolor,
+                xname,
+                xfamily);
             return result;
         }
     }
 
+    public enum CellStyleFontFamilyEnum
+    {
+        Roman = 1,
+        Swiss = 2,
+        Modern = 3,
+        Script = 4,
+        Decorative = 5,
+    }
 }
