@@ -461,13 +461,22 @@ namespace OpenXmlPowerTools
                 applyNumberFormat = new XAttribute(SSNoNamespace.applyNumberFormat, 1);
                 numFmtId = new XAttribute(SSNoNamespace.numFmtId, GetNumFmtId(sXDoc, cell.Style.NumFmt));
             }
+            XAttribute applyFill = null;
+            XAttribute fillId = null;
+            if (cell.Style.Fill != null)
+            {
+                applyFill = new XAttribute(NoNamespace.applyFill, 1);
+                fillId = new XAttribute(SSNoNamespace.fillId, GetFillId(sXDoc, cell.Style.Fill));
+            }
             XElement newXf = new XElement(S.xf,
                 applyFont,
                 fontId,
                 applyAlignment,
                 alignment,
                 applyNumberFormat,
-                numFmtId);
+                numFmtId,
+                applyFill,
+                fillId);
             XElement cellXfs = sXDoc
                 .Root
                 .Element(S.cellXfs);
@@ -548,6 +557,30 @@ namespace OpenXmlPowerTools
             XElement numFmt = style.ToXElement();
             numFmts.Add(numFmt);
             return xfNumber;
+        }
+
+        private static int GetFillId(XDocument sXDoc, CellStyleFill style)
+        {
+            XElement fills = sXDoc.Root.Element(S.fills);
+            if (fills == null)
+            {
+                fills = new XElement(S.fills,
+                    new XAttribute(SSNoNamespace.count, 1),
+                    style.ToXElement());
+                sXDoc.Root.Add(fills);
+                style.id = 0;
+                return 0;
+            }
+            if (style.id != null)
+            {
+                return (int)style.id;
+            }
+            XElement fill = style.ToXElement();
+            fills.Add(fill);
+            int count = (int)fills.Attribute(SSNoNamespace.count);
+            fills.SetAttributeValue(SSNoNamespace.count, count + 1);
+            style.id = count;
+            return count;
         }
 
         private static string _EmptyXlsx = @"UEsDBBQABgAIAAAAIQBi7p1oYQEAAJAEAAATAAgCW0NvbnRlbnRfVHlwZXNdLnhtbCCiBAIooAAC

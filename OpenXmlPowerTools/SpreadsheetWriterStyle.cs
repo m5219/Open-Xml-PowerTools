@@ -51,7 +51,27 @@ namespace OpenXmlPowerTools
 
     public class CellStyleFill : CellStyle
     {
-        //TODO
+        // Example : Color = "FFFFFF00"; // yellow fill (ARGB)
+        public string Color { get; set; }
+
+        public XElement ToXElement()
+        {
+            XElement patternFill = null;
+            if (this.Color != null)
+            {
+                var fgColor = new XElement(S.fgColor,
+                                        new XAttribute(SSNoNamespace.rgb, this.Color));
+                var bgColor = new XElement(S.bgColor,
+                                        new XAttribute(NoNamespace.indexed, 64));
+                // only "solid"
+                patternFill = new XElement(S.patternFill,
+                                        new XAttribute(SSNoNamespace.patternType, "solid"),
+                                        fgColor,
+                                        bgColor);
+            }
+            var result = new XElement(S.fill, patternFill);
+            return result;
+        }
     }
 
     public class CellStyleFont : CellStyle

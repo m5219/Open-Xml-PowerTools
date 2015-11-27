@@ -20,7 +20,7 @@ namespace SpreadsheetWriterExample
 
             //BorderExample(tempDi);
             CellAlignmentExample(tempDi);
-            //FillExample(tempDi);
+            FillExample(tempDi);
             FontExample(tempDi);
             NumFmtExample(tempDi);
         }
@@ -77,6 +77,52 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "CellAlignmentExample.xlsx"), wb);
+        }
+
+        static void FillExample(DirectoryInfo dir)
+        {
+            var headerCellStyle = new CellStyleDfn { Font = new CellStyleFont { Bold = true }, HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var yellowFillCellStyle = new CellStyleDfn { Fill = new CellStyleFill { Color = "FFFFFF00" } };
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "Fill",
+                        ColumnHeadings = new CellDfn[]
+                        {
+                            new CellDfn
+                            {
+                                Value = "Color",
+                                Style = headerCellStyle,
+                            },
+                            new CellDfn
+                            {
+                                Value = "Fill",
+                                Style = headerCellStyle,
+                            },
+                        },
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "FFFFFF00",
+                                    },
+                                    new CellDfn {
+                                        Style = yellowFillCellStyle,
+                                    },
+                                }
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "FillExample.xlsx"), wb);
         }
 
         static void FontExample(DirectoryInfo dir)
