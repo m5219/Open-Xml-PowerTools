@@ -468,6 +468,13 @@ namespace OpenXmlPowerTools
                 applyFill = new XAttribute(NoNamespace.applyFill, 1);
                 fillId = new XAttribute(SSNoNamespace.fillId, GetFillId(sXDoc, cell.Style.Fill));
             }
+            XAttribute applyBorder = null;
+            XAttribute borderId = null;
+            if (cell.Style.Border != null)
+            {
+                applyBorder = new XAttribute(NoNamespace.applyBorder, 1);
+                borderId = new XAttribute(SSNoNamespace.borderId, GetBorderId(sXDoc, cell.Style.Border));
+            }
             XElement newXf = new XElement(S.xf,
                 applyFont,
                 fontId,
@@ -476,7 +483,9 @@ namespace OpenXmlPowerTools
                 applyNumberFormat,
                 numFmtId,
                 applyFill,
-                fillId);
+                fillId,
+                applyBorder,
+                borderId);
             XElement cellXfs = sXDoc
                 .Root
                 .Element(S.cellXfs);
@@ -579,6 +588,30 @@ namespace OpenXmlPowerTools
             fills.Add(fill);
             int count = (int)fills.Attribute(SSNoNamespace.count);
             fills.SetAttributeValue(SSNoNamespace.count, count + 1);
+            style.id = count;
+            return count;
+        }
+
+        private static int GetBorderId(XDocument sXDoc, CellStyleBorder style)
+        {
+            XElement borders = sXDoc.Root.Element(S.borders);
+            if (borders == null)
+            {
+                borders = new XElement(S.borders,
+                    new XAttribute(SSNoNamespace.count, 1),
+                    style.ToXElement());
+                sXDoc.Root.Add(borders);
+                style.id = 0;
+                return 0;
+            }
+            if (style.id != null)
+            {
+                return (int)style.id;
+            }
+            XElement border = style.ToXElement();
+            borders.Add(border);
+            int count = (int)borders.Attribute(SSNoNamespace.count);
+            borders.SetAttributeValue(SSNoNamespace.count, count + 1);
             style.id = count;
             return count;
         }

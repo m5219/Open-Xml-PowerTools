@@ -18,11 +18,176 @@ namespace SpreadsheetWriterExample
             var tempDi = new DirectoryInfo(string.Format("ExampleOutput-{0:00}-{1:00}-{2:00}-{3:00}{4:00}{5:00}", n.Year - 2000, n.Month, n.Day, n.Hour, n.Minute, n.Second));
             tempDi.Create();
 
-            //BorderExample(tempDi);
+            BorderExample(tempDi);
             CellAlignmentExample(tempDi);
             FillExample(tempDi);
             FontExample(tempDi);
             NumFmtExample(tempDi);
+        }
+
+        static void BorderExample(DirectoryInfo dir)
+        {
+            var headerCellStyle = new CellStyleDfn { Font = new CellStyleFont { Bold = true }, HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var boxBorderCellStyle = new CellStyleDfn { Border = CellStyleBorder.CreateBoxBorder(CellStyleBorder.Thin) };
+            var redBoxBorderCellStyle = new CellStyleDfn { Border = CellStyleBorder.CreateBoxBorder(CellStyleBorder.Thin, "FFFF0000") };
+            var underBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder { BottomStyle = CellStyleBorder.Thin } };
+            var thickUnderBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder { BottomStyle = CellStyleBorder.Thick } };
+            var redUnderBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder { BottomStyle = CellStyleBorder.Thin, Color = "FFFF0000" } };
+            var diagonalUpBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder { DiagonalUp = true, DiagonalStyle = CellStyleBorder.Thin } };
+            var diagonalDownBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder { DiagonalDown = true, DiagonalStyle = CellStyleBorder.Thin } };
+            var colorfulBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder {
+                LeftStyle = CellStyleBorder.Thick,
+                LeftColor = "FFFF0000",
+                RightStyle = CellStyleBorder.Thick,
+                RightColor = "FF00FF00",
+                TopStyle = CellStyleBorder.Thick,
+                TopColor = "FF0000FF",
+                BottomStyle = CellStyleBorder.Thick,
+                BottomColor = "FFFFFF00",
+                DiagonalStyle = CellStyleBorder.Thick,
+                DiagonalColor = "FF00FFFF",
+                DiagonalUp = true, DiagonalDown = true
+            }};
+            var emptyRow = new RowDfn { Cells = new CellDfn[] { new CellDfn() } };
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "Border",
+                        ColumnHeadings = new CellDfn[]
+                        {
+                            new CellDfn
+                            {
+                                Value = "Caption",
+                                Style = headerCellStyle,
+                            },
+                            new CellDfn
+                            {
+                                Value = "Border",
+                                Style = headerCellStyle,
+                            },
+                        },
+                        Rows = new RowDfn[]
+                        {
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "box",
+                                    },
+                                    new CellDfn {
+                                        Style = boxBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "box (red)",
+                                    },
+                                    new CellDfn {
+                                        Style = redBoxBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "under",
+                                    },
+                                    new CellDfn {
+                                        Style = underBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "thick under",
+                                    },
+                                    new CellDfn {
+                                        Style = thickUnderBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "under (red)",
+                                    },
+                                    new CellDfn {
+                                        Style = redUnderBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "diagonal up",
+                                    },
+                                    new CellDfn {
+                                        Style = diagonalUpBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "diagonal down",
+                                    },
+                                    new CellDfn {
+                                        Style = diagonalDownBorderCellStyle,
+                                    },
+                                },
+                            },
+                            emptyRow,
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "colorful",
+                                    },
+                                    new CellDfn {
+                                        Style = colorfulBorderCellStyle,
+                                    },
+                                },
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "BorderExample.xlsx"), wb);
         }
 
         static void CellAlignmentExample(DirectoryInfo dir)
