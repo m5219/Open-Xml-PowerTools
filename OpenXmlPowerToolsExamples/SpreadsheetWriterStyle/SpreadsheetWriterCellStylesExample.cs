@@ -18,11 +18,14 @@ namespace SpreadsheetWriterExample
             var tempDi = new DirectoryInfo(string.Format("ExampleOutput-{0:00}-{1:00}-{2:00}-{3:00}{4:00}{5:00}", n.Year - 2000, n.Month, n.Day, n.Hour, n.Minute, n.Second));
             tempDi.Create();
 
+            // cell-styles
             BorderExample(tempDi);
             CellAlignmentExample(tempDi);
             FillExample(tempDi);
             FontExample(tempDi);
             NumFmtExample(tempDi);
+            //col width
+            ColWidthExample(tempDi);
         }
 
         static void BorderExample(DirectoryInfo dir)
@@ -974,6 +977,46 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "NumFmtExample.xlsx"), wb);
+        }
+
+        static void ColWidthExample(DirectoryInfo dir)
+        {
+            var centerCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var leftCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Left };
+            var rightCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Right };
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "ColWidth",
+                        Cols = new ColDfn[]
+                        {
+                            null,
+                            new ColDfn { Width = (decimal)24.68 }
+                        },
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "Default width",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "width: 24.68",
+                                    },
+                                },
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "ColWidthExample.xlsx"), wb);
         }
     }
 }

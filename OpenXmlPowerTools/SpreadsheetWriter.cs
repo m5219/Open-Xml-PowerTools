@@ -45,6 +45,7 @@ namespace OpenXmlPowerTools
     {
         public string Name;
         public string TableName;
+        public IEnumerable<ColDfn> Cols;
         public IEnumerable<CellDfn> ColumnHeadings;
         public IEnumerable<RowDfn> Rows;
     }
@@ -266,6 +267,10 @@ namespace OpenXmlPowerTools
                 {
                     partXmlWriter.WriteStartDocument();
                     partXmlWriter.WriteStartElement("worksheet", ws);
+                    if (worksheetData.Cols != null)
+                    {
+                        SerializeCols(sDoc, partXmlWriter, worksheetData.Cols);
+                    }
                     partXmlWriter.WriteStartElement("sheetData", ws);
 
                     int numColumnHeadingRows = 0;
@@ -324,6 +329,46 @@ namespace OpenXmlPowerTools
             }
             sDoc.WorkbookPart.WorkbookStylesPart.PutXDocument();
             sDoc.WorkbookPart.WorkbookStylesPart.Stylesheet.Save();
+        }
+
+        private static void SerializeCols(SpreadsheetDocument sDoc, XmlWriter xw, IEnumerable<ColDfn> cols)
+        {
+            string ns = S.s.NamespaceName;
+
+            xw.WriteStartElement("cols", ns);
+            int colIndex = 1;
+            foreach (var col in cols)
+            {
+                if (col != null && col.Width != null)
+                {
+                    xw.WriteStartElement("col", ns);
+
+                    // min
+                    xw.WriteStartAttribute("min");
+                    xw.WriteValue(colIndex);
+                    xw.WriteEndAttribute();
+                    // max
+                    xw.WriteStartAttribute("max");
+                    xw.WriteValue(colIndex);
+                    xw.WriteEndAttribute();
+                    // width
+                    xw.WriteStartAttribute("width");
+                    xw.WriteValue(col.Width);
+                    xw.WriteEndAttribute();
+                    // bestFit
+                    xw.WriteStartAttribute("bestFit");
+                    xw.WriteValue(1);
+                    xw.WriteEndAttribute();
+                    // customWidth
+                    xw.WriteStartAttribute("customWidth");
+                    xw.WriteValue(1);
+                    xw.WriteEndAttribute();
+
+                    xw.WriteEndElement();
+                }
+                colIndex++;
+            }
+            xw.WriteEndElement();
         }
 
         private static void SerializeRows(SpreadsheetDocument sDoc, XmlWriter xmlWriter, IEnumerable<RowDfn> rows,

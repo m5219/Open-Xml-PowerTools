@@ -7,6 +7,11 @@ using System.Xml.Linq;
 
 namespace OpenXmlPowerTools
 {
+    public class ColDfn
+    {
+        public decimal? Width;
+    }
+
     public class CellStyleDfn : CellStyle
     {
         public HorizontalCellAlignment? HorizontalCellAlignment;
