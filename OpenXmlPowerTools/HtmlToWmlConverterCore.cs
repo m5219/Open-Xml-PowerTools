@@ -803,12 +803,41 @@ namespace OpenXmlPowerTools.HtmlToWml
                         }
                         catch (UriFormatException)
                         {
-                            return null;
+                            XElement rPr = GetRunProperties(element, settings);
+                            XElement run = new XElement(W.r,
+                                    rPr,
+                                    new XElement(W.t, element.Value));
+                            return new[] { run };
                         }
 
                         if (uri != null)
                         {
                             wDoc.MainDocumentPart.AddHyperlinkRelationship(uri, true, rId);
+                            if (element.Element(XhtmlNoNamespace.img) != null)
+                            {
+                                var imageTransformed = element.Nodes().Select(n => Transform(n, settings, wDoc, nextExpected, preserveWhiteSpace)).OfType<XElement>();
+                                var newImageTransformed = imageTransformed
+                                    .Select(i =>
+                                    {
+                                        if (i.Elements(W.drawing).Any())
+                                        {
+                                            var newRun = new XElement(i);
+                                            var docPr = newRun.Elements(W.drawing).Elements(WP.inline).Elements(WP.docPr).FirstOrDefault();
+                                            if (docPr != null)
+                                            {
+                                                var hlinkClick = new XElement(A.hlinkClick,
+                                                    new XAttribute(R.id, rId),
+                                                    new XAttribute(XNamespace.Xmlns + "a", A.a.NamespaceName));
+                                                docPr.Add(hlinkClick);
+                                            }
+                                            return newRun;
+                                        }
+                                        return i;
+                                    })
+                                    .ToList();
+                                return newImageTransformed;
+                            }
+
                             XElement rPr = GetRunProperties(element, settings);
                             XElement hyperlink = new XElement(W.hyperlink,
                                 new XAttribute(R.id, rId),
@@ -1018,9 +1047,20 @@ namespace OpenXmlPowerTools.HtmlToWml
                     var hasOtherThanSpansAndParas = element.Descendants().Any(d => d.Name != XhtmlNoNamespace.span && d.Name != XhtmlNoNamespace.p);
                     if (tdText != "" || hasOtherThanSpansAndParas)
                     {
+                        var newElementRaw = new XElement("dummy", element.Nodes().Select(n => Transform(n, settings, wDoc, NextExpected.Paragraph, preserveWhiteSpace)));
+                        var newElements = new XElement("dummy",
+                            newElementRaw
+                            .Elements()
+                            .Select(e =>
+                            {
+                                if (e.Name == W.hyperlink || e.Name == W.r)
+                                    return new XElement(W.p, e);
+                                return e;
+                            }));
+
                         return new XElement(W.tc,
                             GetCellProperties(element),
-                            element.Nodes().Select(n => Transform(n, settings, wDoc, NextExpected.Paragraph, preserveWhiteSpace)));
+                            newElements.Elements());
                     }
                     else
                     {
@@ -2314,23 +2354,40 @@ namespace OpenXmlPowerTools.HtmlToWml
 
         private static XElement TransformImageToWml(XElement element, HtmlToWmlConverterSettings settings, WordprocessingDocument wDoc)
         {
-            string imageName = (string)element.Attribute(XhtmlNoNamespace.src);
-            Bitmap bmp;
-            try
+            string srcAttribute = (string)element.Attribute(XhtmlNoNamespace.src);
+            byte[] ba = null;
+            Bitmap bmp = null;
+
+            if (srcAttribute.StartsWith("data:"))
             {
-                bmp = new Bitmap(settings.BaseUriForImages + "/" + imageName);
+                var semiIndex = srcAttribute.IndexOf(';');
+                var commaIndex = srcAttribute.IndexOf(',', semiIndex);
+                var base64 = srcAttribute.Substring(commaIndex + 1);
+                ba = Convert.FromBase64String(base64);
+                using (MemoryStream ms = new MemoryStream(ba))
+                {
+                    bmp = new Bitmap(ms);
+                }
             }
-            catch (ArgumentException)
+            else
             {
-                return null;
+                try
+                {
+                    bmp = new Bitmap(settings.BaseUriForImages + "/" + srcAttribute);
+                }
+                catch (ArgumentException)
+                {
+                    return null;
+                }
+                catch (NotSupportedException)
+                {
+                    return null;
+                }
+                MemoryStream ms = new MemoryStream();
+                bmp.Save(ms, bmp.RawFormat);
+                ba = ms.ToArray();
             }
-            catch (NotSupportedException)
-            {
-                return null;
-            }
-            MemoryStream ms = new MemoryStream();
-            bmp.Save(ms, bmp.RawFormat);
-            byte[] ba = ms.ToArray();
+
             MainDocumentPart mdp = wDoc.MainDocumentPart;
             string rId = "R" + Guid.NewGuid().ToString().Replace("-", "");
             ImagePartType ipt = ImagePartType.Png;
