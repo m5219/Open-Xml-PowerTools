@@ -7,10 +7,6 @@ using System.Xml.Linq;
 
 namespace OpenXmlPowerTools
 {
-    public class SpreadsheetWriterStyle
-    {
-    }
-
     public class CellStyleDfn : CellStyle
     {
         public HorizontalCellAlignment? HorizontalCellAlignment;
