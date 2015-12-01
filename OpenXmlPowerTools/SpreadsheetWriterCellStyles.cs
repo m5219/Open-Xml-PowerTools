@@ -15,11 +15,32 @@ namespace OpenXmlPowerTools
     public class CellStyleDfn : CellStyle
     {
         public HorizontalCellAlignment? HorizontalCellAlignment;
+        public VerticalCellAlignment? VerticalCellAlignment;
 
         public CellStyleNumFmt NumFmt;
         public CellStyleBorder Border;
         public CellStyleFill Fill;
         public CellStyleFont Font;
+
+        public XElement GetAlignmentXElement()
+        {
+            XElement result = null;
+            XAttribute ha = null;
+            XAttribute va = null;
+            if (this.HorizontalCellAlignment != null)
+            {
+                ha = new XAttribute(SSNoNamespace.horizontal, this.HorizontalCellAlignment.ToString().ToLower());
+            }
+            if (this.VerticalCellAlignment != null)
+            {
+                va = new XAttribute(NoNamespace.vertical, this.VerticalCellAlignment.ToString().ToLower());
+            }
+            if (ha != null || va != null)
+            {
+                result = new XElement(S.alignment, ha, va);
+            }
+            return result;
+        }
     }
 
     public class CellStyle

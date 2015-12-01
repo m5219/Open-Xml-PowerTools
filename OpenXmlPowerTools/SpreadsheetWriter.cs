@@ -107,6 +107,13 @@ namespace OpenXmlPowerTools
         Right,
     }
 
+    public enum VerticalCellAlignment
+    {
+        Bottom,
+        Center,
+        Top,
+    }
+
     public enum CellDataType
     {
         Boolean,
@@ -494,41 +501,40 @@ namespace OpenXmlPowerTools
 
         private static int CreateNewStyle(XDocument sXDoc, CellDfn cell, SpreadsheetDocument sDoc)
         {
+            var style = cell.Style;
             XAttribute applyFont = null;
             XAttribute fontId = null;
-            if (cell.Style.Font != null)
+            if (style.Font != null)
             {
                 applyFont = new XAttribute(SSNoNamespace.applyFont, 1);
-                fontId = new XAttribute(SSNoNamespace.fontId, GetFontId(sXDoc, cell.Style.Font));
+                fontId = new XAttribute(SSNoNamespace.fontId, GetFontId(sXDoc, style.Font));
             }
             XAttribute applyAlignment = null;
-            XElement alignment = null;
-            if (cell.Style.HorizontalCellAlignment != null)
+            XElement alignment = style.GetAlignmentXElement();
+            if (alignment != null)
             {
                 applyAlignment = new XAttribute(SSNoNamespace.applyAlignment, 1);
-                alignment = new XElement(S.alignment,
-                    new XAttribute(SSNoNamespace.horizontal, cell.Style.HorizontalCellAlignment.ToString().ToLower()));
             }
             XAttribute applyNumberFormat = null;
             XAttribute numFmtId = null;
-            if (cell.Style.NumFmt != null)
+            if (style.NumFmt != null)
             {
                 applyNumberFormat = new XAttribute(SSNoNamespace.applyNumberFormat, 1);
-                numFmtId = new XAttribute(SSNoNamespace.numFmtId, GetNumFmtId(sXDoc, cell.Style.NumFmt));
+                numFmtId = new XAttribute(SSNoNamespace.numFmtId, GetNumFmtId(sXDoc, style.NumFmt));
             }
             XAttribute applyFill = null;
             XAttribute fillId = null;
-            if (cell.Style.Fill != null)
+            if (style.Fill != null)
             {
                 applyFill = new XAttribute(NoNamespace.applyFill, 1);
-                fillId = new XAttribute(SSNoNamespace.fillId, GetFillId(sXDoc, cell.Style.Fill));
+                fillId = new XAttribute(SSNoNamespace.fillId, GetFillId(sXDoc, style.Fill));
             }
             XAttribute applyBorder = null;
             XAttribute borderId = null;
-            if (cell.Style.Border != null)
+            if (style.Border != null)
             {
                 applyBorder = new XAttribute(NoNamespace.applyBorder, 1);
-                borderId = new XAttribute(SSNoNamespace.borderId, GetBorderId(sXDoc, cell.Style.Border));
+                borderId = new XAttribute(SSNoNamespace.borderId, GetBorderId(sXDoc, style.Border));
             }
             XElement newXf = new XElement(S.xf,
                 applyFont,

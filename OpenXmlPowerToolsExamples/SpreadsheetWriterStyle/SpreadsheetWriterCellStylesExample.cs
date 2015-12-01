@@ -197,9 +197,16 @@ namespace SpreadsheetWriterExample
 
         static void CellAlignmentExample(DirectoryInfo dir)
         {
-            var centerCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var hcenterCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Center };
             var leftCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Left };
             var rightCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Right };
+            var topCellStyle = new CellStyleDfn { VerticalCellAlignment = VerticalCellAlignment.Top };
+            var vcenterCellStyle = new CellStyleDfn { VerticalCellAlignment = VerticalCellAlignment.Center };
+            var bottomCellStyle = new CellStyleDfn { VerticalCellAlignment = VerticalCellAlignment.Bottom };
+            var centerCellStyle = new CellStyleDfn {
+                HorizontalCellAlignment = HorizontalCellAlignment.Center,
+                VerticalCellAlignment = VerticalCellAlignment.Center
+            };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]
@@ -215,8 +222,8 @@ namespace SpreadsheetWriterExample
                                 {
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
-                                        Value = "center",
-                                        Style = centerCellStyle,
+                                        Value = "horizontal center",
+                                        Style = hcenterCellStyle,
                                     },
                                 }
                             },
@@ -239,6 +246,50 @@ namespace SpreadsheetWriterExample
                                         CellDataType = CellDataType.String,
                                         Value = "right",
                                         Style = rightCellStyle,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "top",
+                                        Style = topCellStyle,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "vertical center",
+                                        Style = vcenterCellStyle,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "bottom",
+                                        Style = bottomCellStyle,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "center",
+                                        Style = centerCellStyle,
                                     },
                                 }
                             },
