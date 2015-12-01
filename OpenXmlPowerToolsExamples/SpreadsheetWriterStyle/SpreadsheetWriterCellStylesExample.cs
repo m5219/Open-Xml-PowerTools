@@ -28,6 +28,9 @@ namespace SpreadsheetWriterExample
             // row / column styles
             RowHeightExample(tempDi);
             ColWidthExample(tempDi);
+
+            // Write to MemoryStream
+            WriteToStreamExample(tempDi);
         }
 
         static void BorderExample(DirectoryInfo dir)
@@ -1106,6 +1109,36 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "ColWidthExample.xlsx"), wb);
+        }
+
+        static void WriteToStreamExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "WriteToStream",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "Hello",
+                                    },
+                                },
+                            },
+                        }
+                    }
+                }
+            };
+            MemoryStream stream;
+            SpreadsheetWriter.Write(out stream, wb);
+            File.WriteAllBytes(Path.Combine(dir.FullName, "WriteToStreamExample.xlsx"), stream.ToArray());
         }
     }
 }

@@ -124,6 +124,31 @@ namespace OpenXmlPowerTools
 
     public static class SpreadsheetWriter
     {
+        public static void Write(out MemoryStream stream, WorkbookDfn workbook)
+        {
+            try
+            {
+                stream = new MemoryStream();
+
+                // create the blank workbook
+                char[] base64CharArray = _EmptyXlsx
+                    .Where(c => c != '\r' && c != '\n').ToArray();
+                byte[] byteArray =
+                    System.Convert.FromBase64CharArray(base64CharArray,
+                    0, base64CharArray.Length);
+                stream.Write(byteArray, 0, byteArray.Count());
+
+                // open the workbook, and create the TableProperties sheet, populate it
+                Write(SpreadsheetDocument.Open(stream, true), workbook);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unhandled exception: {0} in {1}",
+                    e.ToString(), e.Source);
+                throw e;
+            }
+        }
+
         public static void Write(string fileName, WorkbookDfn workbook)
         {
             try
@@ -144,63 +169,68 @@ namespace OpenXmlPowerTools
                 File.WriteAllBytes(fi.FullName, byteArray);
 
                 // open the workbook, and create the TableProperties sheet, populate it
-                using (SpreadsheetDocument sDoc = SpreadsheetDocument.Open(fi.FullName, true))
-                {
-                    WorkbookPart workbookPart = sDoc.WorkbookPart;
-                    XDocument wXDoc = workbookPart.GetXDocument();
-                    XElement sheetElement = wXDoc
-                        .Root
-                        .Elements(S.sheets)
-                        .Elements(S.sheet)
-                        .Where(s => (string)s.Attribute(SSNoNamespace.name) == "Sheet1")
-                        .FirstOrDefault();
-                    if (sheetElement == null)
-                        throw new SpreadsheetWriterInternalException();
-                    string id = (string)sheetElement.Attribute(R.id);
-                    sheetElement.Remove();
-                    workbookPart.PutXDocument();
-
-                    WorksheetPart sPart = (WorksheetPart)workbookPart.GetPartById(id);
-                    workbookPart.DeletePart(sPart);
-
-                    XDocument appXDoc = sDoc
-                        .ExtendedFilePropertiesPart
-                        .GetXDocument();
-                    XElement vector = appXDoc
-                        .Root
-                        .Elements(EP.TitlesOfParts)
-                        .Elements(VT.vector)
-                        .FirstOrDefault();
-                    if (vector != null)
-                    {
-                        vector.SetAttributeValue(SSNoNamespace.size, 0);
-                        XElement lpstr = vector.Element(VT.lpstr);
-                        lpstr.Remove();
-                    }
-                    XElement vector2 = appXDoc
-                        .Root
-                        .Elements(EP.HeadingPairs)
-                        .Elements(VT.vector)
-                        .FirstOrDefault();
-                    XElement variant = vector2
-                        .Descendants(VT.i4)
-                        .FirstOrDefault();
-                    if (variant != null)
-                        variant.Value = "1";
-                    sDoc.ExtendedFilePropertiesPart.PutXDocument();
-
-                    if (workbook.Worksheets != null)
-                        foreach (var worksheet in workbook.Worksheets)
-                            AddWorksheet(sDoc, worksheet);
-
-                    workbookPart.WorkbookStylesPart.PutXDocument();
-                }
+                Write(SpreadsheetDocument.Open(fi.FullName, true), workbook);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unhandled exception: {0} in {1}",
                     e.ToString(), e.Source);
                 throw e;
+            }
+        }
+
+        private static void Write(SpreadsheetDocument doc, WorkbookDfn workbook)
+        {
+            using (SpreadsheetDocument sDoc = doc)
+            {
+                WorkbookPart workbookPart = sDoc.WorkbookPart;
+                XDocument wXDoc = workbookPart.GetXDocument();
+                XElement sheetElement = wXDoc
+                    .Root
+                    .Elements(S.sheets)
+                    .Elements(S.sheet)
+                    .Where(s => (string)s.Attribute(SSNoNamespace.name) == "Sheet1")
+                    .FirstOrDefault();
+                if (sheetElement == null)
+                    throw new SpreadsheetWriterInternalException();
+                string id = (string)sheetElement.Attribute(R.id);
+                sheetElement.Remove();
+                workbookPart.PutXDocument();
+
+                WorksheetPart sPart = (WorksheetPart)workbookPart.GetPartById(id);
+                workbookPart.DeletePart(sPart);
+
+                XDocument appXDoc = sDoc
+                    .ExtendedFilePropertiesPart
+                    .GetXDocument();
+                XElement vector = appXDoc
+                    .Root
+                    .Elements(EP.TitlesOfParts)
+                    .Elements(VT.vector)
+                    .FirstOrDefault();
+                if (vector != null)
+                {
+                    vector.SetAttributeValue(SSNoNamespace.size, 0);
+                    XElement lpstr = vector.Element(VT.lpstr);
+                    lpstr.Remove();
+                }
+                XElement vector2 = appXDoc
+                    .Root
+                    .Elements(EP.HeadingPairs)
+                    .Elements(VT.vector)
+                    .FirstOrDefault();
+                XElement variant = vector2
+                    .Descendants(VT.i4)
+                    .FirstOrDefault();
+                if (variant != null)
+                    variant.Value = "1";
+                sDoc.ExtendedFilePropertiesPart.PutXDocument();
+
+                if (workbook.Worksheets != null)
+                    foreach (var worksheet in workbook.Worksheets)
+                        AddWorksheet(sDoc, worksheet);
+
+                workbookPart.WorkbookStylesPart.PutXDocument();
             }
         }
 
