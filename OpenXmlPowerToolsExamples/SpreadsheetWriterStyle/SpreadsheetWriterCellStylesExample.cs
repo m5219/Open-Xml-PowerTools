@@ -24,7 +24,9 @@ namespace SpreadsheetWriterExample
             FillExample(tempDi);
             FontExample(tempDi);
             NumFmtExample(tempDi);
-            //col width
+
+            // row / column styles
+            RowHeightExample(tempDi);
             ColWidthExample(tempDi);
         }
 
@@ -979,11 +981,47 @@ namespace SpreadsheetWriterExample
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "NumFmtExample.xlsx"), wb);
         }
 
+        static void RowHeightExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "RowHeight",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "Default height",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Height = (decimal)33.3,
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "height: 33.3",
+                                    },
+                                },
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "RowHeightExample.xlsx"), wb);
+        }
+
         static void ColWidthExample(DirectoryInfo dir)
         {
-            var centerCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Center };
-            var leftCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Left };
-            var rightCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Right };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]

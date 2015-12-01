@@ -53,6 +53,7 @@ namespace OpenXmlPowerTools
     public class RowDfn
     {
         public IEnumerable<CellDfn> Cells;
+        public decimal? Height;
     }
 
     // Value can be:
@@ -411,6 +412,15 @@ namespace OpenXmlPowerTools
             xw.WriteStartAttribute("spans");
             xw.WriteValue("1:" + row.Cells.Count().ToString());
             xw.WriteEndAttribute();
+            if (row != null && row.Height != null)
+            {
+                xw.WriteStartAttribute("ht");
+                xw.WriteValue(row.Height);
+                xw.WriteEndAttribute();
+                xw.WriteStartAttribute("customHeight");
+                xw.WriteValue(1);
+                xw.WriteEndAttribute();
+            }
             int cellCount = 0;
             foreach (var cell in row.Cells)
             {
