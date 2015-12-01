@@ -21,26 +21,6 @@ namespace OpenXmlPowerTools
         public CellStyleBorder Border;
         public CellStyleFill Fill;
         public CellStyleFont Font;
-
-        public XElement GetAlignmentXElement()
-        {
-            XElement result = null;
-            XAttribute ha = null;
-            XAttribute va = null;
-            if (this.HorizontalCellAlignment != null)
-            {
-                ha = new XAttribute(SSNoNamespace.horizontal, this.HorizontalCellAlignment.ToString().ToLower());
-            }
-            if (this.VerticalCellAlignment != null)
-            {
-                va = new XAttribute(NoNamespace.vertical, this.VerticalCellAlignment.ToString().ToLower());
-            }
-            if (ha != null || va != null)
-            {
-                result = new XElement(S.alignment, ha, va);
-            }
-            return result;
-        }
     }
 
     public class CellStyle
@@ -51,14 +31,6 @@ namespace OpenXmlPowerTools
     public class CellStyleNumFmt : CellStyle
     {
         public string formatCode;
-
-        public XElement ToXElement()
-        {
-            var result = new XElement(S.numFmt,
-                new XAttribute(SSNoNamespace.numFmtId, this.id),
-                new XAttribute(SSNoNamespace.formatCode, formatCode));
-            return result;
-        }
     }
 
     public class CellStyleBorder : CellStyle
@@ -107,85 +79,12 @@ namespace OpenXmlPowerTools
             result.Color = color;
             return result;
         }
-
-        public XElement ToXElement()
-        {
-            XElement color = CellStyleUtil.CreateColorXElement(this.Color);
-            XElement left = null;
-            XElement right = null;
-            XElement top = null;
-            XElement bottom = null;
-            XElement diagonal = null;
-            XAttribute diagonalUp = null;
-            XAttribute diagonalDown = null;
-            if (this.LeftStyle != null)
-            {
-                left = new XElement(S.left,
-                    new XAttribute(SSNoNamespace.style, this.LeftStyle),
-                    CellStyleUtil.CreateColorXElement(this.LeftColor) ?? color);
-            }
-            if (this.RightStyle != null)
-            {
-                right = new XElement(S.right,
-                    new XAttribute(SSNoNamespace.style, this.RightStyle),
-                    CellStyleUtil.CreateColorXElement(this.RightColor) ?? color);
-            }
-            if (this.TopStyle != null)
-            {
-                top = new XElement(S.top,
-                    new XAttribute(SSNoNamespace.style, this.TopStyle),
-                    CellStyleUtil.CreateColorXElement(this.TopColor) ?? color);
-            }
-            if (this.BottomStyle != null)
-            {
-                bottom = new XElement(S.bottom,
-                    new XAttribute(SSNoNamespace.style, this.BottomStyle),
-                    CellStyleUtil.CreateColorXElement(this.BottomColor) ?? color);
-            }
-            if (this.DiagonalStyle != null)
-            {
-                diagonal = new XElement(S.diagonal,
-                    new XAttribute(SSNoNamespace.style, this.DiagonalStyle),
-                    CellStyleUtil.CreateColorXElement(this.DiagonalColor) ?? color);
-            }
-            if (this.DiagonalUp)
-            {
-                diagonalUp = new XAttribute("diagonalUp", 1);
-            }
-            if (this.DiagonalDown)
-            {
-                diagonalDown = new XAttribute("diagonalDown", 1);
-            }
-            var result = new XElement(S.border,
-                diagonalUp, diagonalDown,
-                left, right, top, bottom, diagonal);
-            return result;
-        }
     }
 
     public class CellStyleFill : CellStyle
     {
         // Example : Color = "FFFFFF00"; // yellow fill (ARGB)
         public string Color;
-
-        public XElement ToXElement()
-        {
-            XElement patternFill = null;
-            if (this.Color != null)
-            {
-                var fgColor = new XElement(S.fgColor,
-                                        new XAttribute(SSNoNamespace.rgb, this.Color));
-                var bgColor = new XElement(S.bgColor,
-                                        new XAttribute(NoNamespace.indexed, 64));
-                // only "solid"
-                patternFill = new XElement(S.patternFill,
-                                        new XAttribute(SSNoNamespace.patternType, "solid"),
-                                        fgColor,
-                                        bgColor);
-            }
-            var result = new XElement(S.fill, patternFill);
-            return result;
-        }
     }
 
     public class CellStyleFont : CellStyle
@@ -195,41 +94,6 @@ namespace OpenXmlPowerTools
         public string Color;
         public bool? Bold;
         public bool? Italic;
-
-        public XElement ToXElement()
-        {
-            XElement xsize = null;
-            if (this.Size != null)
-            {
-                xsize = new XElement(S.sz, new XAttribute(SSNoNamespace.val, this.Size));
-            }
-            XElement xname = null;
-            XElement xfamily = null;
-            if (this.Name != null)
-            {
-                xname = new XElement(S.name, new XAttribute(SSNoNamespace.val, this.Name));
-                xfamily = new XElement(S.family, new XAttribute(SSNoNamespace.val, (int)CellStyleFontFamilyEnum.Swiss));
-            }
-            XElement xcolor = CellStyleUtil.CreateColorXElement(this.Color);
-            XElement xbold = null;
-            if (this.Bold == true)
-            {
-                xbold = new XElement(S.b);
-            }
-            XElement xitalic = null;
-            if (this.Italic == true)
-            {
-                xitalic = new XElement(S.i);
-            }
-            var result = new XElement(S.font,
-                xbold,
-                xitalic,
-                xsize,
-                xcolor,
-                xname,
-                xfamily);
-            return result;
-        }
     }
 
     public enum CellStyleFontFamilyEnum
@@ -251,6 +115,142 @@ namespace OpenXmlPowerTools
                 result = new XElement(S.color,
                     new XAttribute(SSNoNamespace.rgb, color));
             }
+            return result;
+        }
+
+        public static XElement CreateAlignmentXElement(CellStyleDfn style)
+        {
+            XElement result = null;
+            XAttribute ha = null;
+            XAttribute va = null;
+            if (style.HorizontalCellAlignment != null)
+            {
+                ha = new XAttribute(SSNoNamespace.horizontal, style.HorizontalCellAlignment.ToString().ToLower());
+            }
+            if (style.VerticalCellAlignment != null)
+            {
+                va = new XAttribute(NoNamespace.vertical, style.VerticalCellAlignment.ToString().ToLower());
+            }
+            if (ha != null || va != null)
+            {
+                result = new XElement(S.alignment, ha, va);
+            }
+            return result;
+        }
+
+        public static XElement ToXElement(CellStyleNumFmt style)
+        {
+            var result = new XElement(S.numFmt,
+                new XAttribute(SSNoNamespace.numFmtId, style.id),
+                new XAttribute(SSNoNamespace.formatCode, style.formatCode));
+            return result;
+        }
+
+        public static XElement ToXElement(CellStyleBorder style)
+        {
+            XElement color = CreateColorXElement(style.Color);
+            XElement left = null;
+            XElement right = null;
+            XElement top = null;
+            XElement bottom = null;
+            XElement diagonal = null;
+            XAttribute diagonalUp = null;
+            XAttribute diagonalDown = null;
+            if (style.LeftStyle != null)
+            {
+                left = new XElement(S.left,
+                    new XAttribute(SSNoNamespace.style, style.LeftStyle),
+                    CreateColorXElement(style.LeftColor) ?? color);
+            }
+            if (style.RightStyle != null)
+            {
+                right = new XElement(S.right,
+                    new XAttribute(SSNoNamespace.style, style.RightStyle),
+                    CreateColorXElement(style.RightColor) ?? color);
+            }
+            if (style.TopStyle != null)
+            {
+                top = new XElement(S.top,
+                    new XAttribute(SSNoNamespace.style, style.TopStyle),
+                    CreateColorXElement(style.TopColor) ?? color);
+            }
+            if (style.BottomStyle != null)
+            {
+                bottom = new XElement(S.bottom,
+                    new XAttribute(SSNoNamespace.style, style.BottomStyle),
+                    CreateColorXElement(style.BottomColor) ?? color);
+            }
+            if (style.DiagonalStyle != null)
+            {
+                diagonal = new XElement(S.diagonal,
+                    new XAttribute(SSNoNamespace.style, style.DiagonalStyle),
+                    CreateColorXElement(style.DiagonalColor) ?? color);
+            }
+            if (style.DiagonalUp)
+            {
+                diagonalUp = new XAttribute("diagonalUp", 1);
+            }
+            if (style.DiagonalDown)
+            {
+                diagonalDown = new XAttribute("diagonalDown", 1);
+            }
+            var result = new XElement(S.border,
+                diagonalUp, diagonalDown,
+                left, right, top, bottom, diagonal);
+            return result;
+        }
+
+        public static XElement ToXElement(CellStyleFill style)
+        {
+            XElement patternFill = null;
+            if (style.Color != null)
+            {
+                var fgColor = new XElement(S.fgColor,
+                                        new XAttribute(SSNoNamespace.rgb, style.Color));
+                var bgColor = new XElement(S.bgColor,
+                                        new XAttribute(NoNamespace.indexed, 64));
+                // only "solid"
+                patternFill = new XElement(S.patternFill,
+                                        new XAttribute(SSNoNamespace.patternType, "solid"),
+                                        fgColor,
+                                        bgColor);
+            }
+            var result = new XElement(S.fill, patternFill);
+            return result;
+        }
+
+        public static XElement ToXElement(CellStyleFont style)
+        {
+            XElement xsize = null;
+            if (style.Size != null)
+            {
+                xsize = new XElement(S.sz, new XAttribute(SSNoNamespace.val, style.Size));
+            }
+            XElement xname = null;
+            XElement xfamily = null;
+            if (style.Name != null)
+            {
+                xname = new XElement(S.name, new XAttribute(SSNoNamespace.val, style.Name));
+                xfamily = new XElement(S.family, new XAttribute(SSNoNamespace.val, (int)CellStyleFontFamilyEnum.Swiss));
+            }
+            XElement xcolor = CreateColorXElement(style.Color);
+            XElement xbold = null;
+            if (style.Bold == true)
+            {
+                xbold = new XElement(S.b);
+            }
+            XElement xitalic = null;
+            if (style.Italic == true)
+            {
+                xitalic = new XElement(S.i);
+            }
+            var result = new XElement(S.font,
+                xbold,
+                xitalic,
+                xsize,
+                xcolor,
+                xname,
+                xfamily);
             return result;
         }
     }

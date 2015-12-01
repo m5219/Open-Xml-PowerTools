@@ -510,7 +510,7 @@ namespace OpenXmlPowerTools
                 fontId = new XAttribute(SSNoNamespace.fontId, GetFontId(sXDoc, style.Font));
             }
             XAttribute applyAlignment = null;
-            XElement alignment = style.GetAlignmentXElement();
+            XElement alignment = CellStyleUtil.CreateAlignmentXElement(style);
             if (alignment != null)
             {
                 applyAlignment = new XAttribute(SSNoNamespace.applyAlignment, 1);
@@ -573,7 +573,7 @@ namespace OpenXmlPowerTools
             {
                 fonts = new XElement(S.fonts,
                     new XAttribute(SSNoNamespace.count, 1),
-                    style.ToXElement());
+                    CellStyleUtil.ToXElement(style));
                 sXDoc.Root.Add(fonts);
                 style.id = 0;
                 return 0;
@@ -582,7 +582,7 @@ namespace OpenXmlPowerTools
             {
                 return (int)style.id;
             }
-            XElement font = style.ToXElement();
+            XElement font = CellStyleUtil.ToXElement(style);
             fonts.Add(font);
             int count = (int)fonts.Attribute(SSNoNamespace.count);
             fonts.SetAttributeValue(SSNoNamespace.count, count + 1);
@@ -620,11 +620,11 @@ namespace OpenXmlPowerTools
             {
                 numFmts = new XElement(S.numFmts,
                     new XAttribute(SSNoNamespace.count, 1),
-                    style.ToXElement());
+                    CellStyleUtil.ToXElement(style));
                 sXDoc.Root.AddFirst(numFmts);
                 return xfNumber;
             }
-            XElement numFmt = style.ToXElement();
+            XElement numFmt = CellStyleUtil.ToXElement(style);
             numFmts.Add(numFmt);
             return xfNumber;
         }
@@ -636,7 +636,7 @@ namespace OpenXmlPowerTools
             {
                 fills = new XElement(S.fills,
                     new XAttribute(SSNoNamespace.count, 1),
-                    style.ToXElement());
+                    CellStyleUtil.ToXElement(style));
                 sXDoc.Root.Add(fills);
                 style.id = 0;
                 return 0;
@@ -645,7 +645,7 @@ namespace OpenXmlPowerTools
             {
                 return (int)style.id;
             }
-            XElement fill = style.ToXElement();
+            XElement fill = CellStyleUtil.ToXElement(style);
             fills.Add(fill);
             int count = (int)fills.Attribute(SSNoNamespace.count);
             fills.SetAttributeValue(SSNoNamespace.count, count + 1);
@@ -660,7 +660,7 @@ namespace OpenXmlPowerTools
             {
                 borders = new XElement(S.borders,
                     new XAttribute(SSNoNamespace.count, 1),
-                    style.ToXElement());
+                    CellStyleUtil.ToXElement(style));
                 sXDoc.Root.Add(borders);
                 style.id = 0;
                 return 0;
@@ -669,7 +669,7 @@ namespace OpenXmlPowerTools
             {
                 return (int)style.id;
             }
-            XElement border = style.ToXElement();
+            XElement border = CellStyleUtil.ToXElement(style);
             borders.Add(border);
             int count = (int)borders.Attribute(SSNoNamespace.count);
             borders.SetAttributeValue(SSNoNamespace.count, count + 1);
