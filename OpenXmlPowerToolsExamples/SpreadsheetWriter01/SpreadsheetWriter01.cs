@@ -20,7 +20,7 @@ namespace SpreadsheetWriterExample
 
             var boldFont = new CellStyleFont { Bold = true };
             var boldCellStyle = new CellStyleDfn { Font = boldFont };
-            var boldAndLeftCellStyle = new CellStyleDfn { Font = boldFont, HorizontalCellAlignment = HorizontalCellAlignment.Left };
+            var boldAndLeftCellStyle = new CellStyleDfn { Font = boldFont, Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Left } };
             var format0_00 = new CellStyleNumFmt { formatCode = "0.00" };
             var numCellStyle = new CellStyleDfn { NumFmt = format0_00 };
             WorkbookDfn wb = new WorkbookDfn

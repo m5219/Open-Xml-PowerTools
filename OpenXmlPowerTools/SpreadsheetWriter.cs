@@ -540,10 +540,11 @@ namespace OpenXmlPowerTools
                 fontId = new XAttribute(SSNoNamespace.fontId, GetFontId(sXDoc, style.Font));
             }
             XAttribute applyAlignment = null;
-            XElement alignment = CellStyleUtil.CreateAlignmentXElement(style);
-            if (alignment != null)
+            XElement alignment = null;
+            if (style.Alignment != null)
             {
                 applyAlignment = new XAttribute(SSNoNamespace.applyAlignment, 1);
+                alignment = CellStyleUtil.ToXElement(style.Alignment);
             }
             XAttribute applyNumberFormat = null;
             XAttribute numFmtId = null;

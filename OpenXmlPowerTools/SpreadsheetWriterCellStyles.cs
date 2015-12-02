@@ -14,14 +14,18 @@ namespace OpenXmlPowerTools
 
     public class CellStyleDfn : CellStyle
     {
-        public HorizontalCellAlignment? HorizontalCellAlignment;
-        public VerticalCellAlignment? VerticalCellAlignment;
-        public bool? WrapText;
-
+        public CellAlignment Alignment;
         public CellStyleNumFmt NumFmt;
         public CellStyleBorder Border;
         public CellStyleFill Fill;
         public CellStyleFont Font;
+    }
+
+    public class CellAlignment
+    {
+        public HorizontalCellAlignment? Horizontal;
+        public VerticalCellAlignment? Vertical;
+        public bool? WrapText;
     }
 
     public class CellStyle
@@ -119,21 +123,21 @@ namespace OpenXmlPowerTools
             return result;
         }
 
-        public static XElement CreateAlignmentXElement(CellStyleDfn style)
+        public static XElement ToXElement(CellAlignment alignment)
         {
             XElement result = null;
             XAttribute ha = null;
             XAttribute va = null;
             XAttribute wt = null;
-            if (style.HorizontalCellAlignment != null)
+            if (alignment.Horizontal != null)
             {
-                ha = new XAttribute(SSNoNamespace.horizontal, style.HorizontalCellAlignment.ToString().ToLower());
+                ha = new XAttribute(SSNoNamespace.horizontal, alignment.Horizontal.ToString().ToLower());
             }
-            if (style.VerticalCellAlignment != null)
+            if (alignment.Vertical != null)
             {
-                va = new XAttribute(NoNamespace.vertical, style.VerticalCellAlignment.ToString().ToLower());
+                va = new XAttribute(NoNamespace.vertical, alignment.Vertical.ToString().ToLower());
             }
-            if (style.WrapText != null && style.WrapText == true)
+            if (alignment.WrapText != null && alignment.WrapText == true)
             {
                 wt = new XAttribute(NoNamespace.wrapText, 1);
             }

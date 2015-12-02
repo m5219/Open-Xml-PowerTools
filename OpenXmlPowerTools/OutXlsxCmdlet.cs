@@ -277,7 +277,7 @@ namespace OpenXmlPowerTools.Commands
                 {
                     SSW.CellDfn dataCell = new SSW.CellDfn();
                     dataCell.Value = dataRow[j];
-                    dataCell.Style = new CellStyleDfn { HorizontalCellAlignment = SSW.HorizontalCellAlignment.Left };
+                    dataCell.Style = new CellStyleDfn { Alignment = new CellAlignment { Horizontal = SSW.HorizontalCellAlignment.Left } };
                     dataCell.CellDataType = CellDataType.String;
                     cellCollection.Add(dataCell);
                 }

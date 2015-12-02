@@ -34,7 +34,7 @@ namespace SpreadsheetWriterExample
 
         static void BorderExample(DirectoryInfo dir)
         {
-            var headerCellStyle = new CellStyleDfn { Font = new CellStyleFont { Bold = true }, HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var headerCellStyle = new CellStyleDfn { Font = new CellStyleFont { Bold = true }, Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Center } };
             var boxBorderCellStyle = new CellStyleDfn { Border = CellStyleBorder.CreateBoxBorder(CellStyleBorder.Thin) };
             var redBoxBorderCellStyle = new CellStyleDfn { Border = CellStyleBorder.CreateBoxBorder(CellStyleBorder.Thin, "FFFF0000") };
             var underBorderCellStyle = new CellStyleDfn { Border = new CellStyleBorder { BottomStyle = CellStyleBorder.Thin } };
@@ -199,17 +199,18 @@ namespace SpreadsheetWriterExample
 
         static void CellAlignmentExample(DirectoryInfo dir)
         {
-            var hcenterCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Center };
-            var leftCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Left };
-            var rightCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Right };
-            var topCellStyle = new CellStyleDfn { VerticalCellAlignment = VerticalCellAlignment.Top };
-            var vcenterCellStyle = new CellStyleDfn { VerticalCellAlignment = VerticalCellAlignment.Center };
-            var bottomCellStyle = new CellStyleDfn { VerticalCellAlignment = VerticalCellAlignment.Bottom };
-            var centerCellStyle = new CellStyleDfn {
-                HorizontalCellAlignment = HorizontalCellAlignment.Center,
-                VerticalCellAlignment = VerticalCellAlignment.Center
-            };
-            var wrapTextCellStyle = new CellStyleDfn { WrapText = true };
+            var hcenterCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Center } };
+            var leftCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Left } };
+            var rightCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Right } };
+            var topCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Vertical = VerticalCellAlignment.Top } };
+            var vcenterCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Vertical = VerticalCellAlignment.Center } };
+            var bottomCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Vertical = VerticalCellAlignment.Bottom } };
+            var centerCellStyle = new CellStyleDfn { Alignment = new CellAlignment
+            {
+                Horizontal = HorizontalCellAlignment.Center,
+                Vertical = VerticalCellAlignment.Center
+            }};
+            var wrapTextCellStyle = new CellStyleDfn { Alignment = new CellAlignment { WrapText = true } };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]
@@ -316,7 +317,10 @@ namespace SpreadsheetWriterExample
 
         static void FillExample(DirectoryInfo dir)
         {
-            var headerCellStyle = new CellStyleDfn { Font = new CellStyleFont { Bold = true }, HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var headerCellStyle = new CellStyleDfn {
+                Font = new CellStyleFont { Bold = true },
+                Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Center },
+            };
             var yellowFillCellStyle = new CellStyleDfn { Fill = new CellStyleFill { Color = "FFFFFF00" } };
             WorkbookDfn wb = new WorkbookDfn
             {
@@ -471,7 +475,11 @@ namespace SpreadsheetWriterExample
 
         static void NumFmtExample(DirectoryInfo dir)
         {
-            var headerCellStyle = new CellStyleDfn { Font = new CellStyleFont { Bold = true}, HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var headerCellStyle = new CellStyleDfn
+            {
+                Font = new CellStyleFont { Bold = true },
+                Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Center },
+            };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]

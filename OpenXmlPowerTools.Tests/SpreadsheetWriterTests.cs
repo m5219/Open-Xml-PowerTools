@@ -39,7 +39,7 @@ namespace OxPt
         {
             var boldFont = new Sw.CellStyleFont { Bold = true };
             var boldCellStyle = new Sw.CellStyleDfn { Font = boldFont };
-            var boldAndLeftCellStyle = new Sw.CellStyleDfn { Font = boldFont, HorizontalCellAlignment = Sw.HorizontalCellAlignment.Left };
+            var boldAndLeftCellStyle = new Sw.CellStyleDfn { Font = boldFont, Alignment = new Sw.CellAlignment { Horizontal = Sw.HorizontalCellAlignment.Left } };
             var format0_00 = new Sw.CellStyleNumFmt { formatCode = "0.00" };
             var numCellStyle = new Sw.CellStyleDfn { NumFmt = format0_00 };
             Sw.WorkbookDfn wb = new Sw.WorkbookDfn
@@ -122,11 +122,11 @@ namespace OxPt
         {
             var boldFont = new Sw.CellStyleFont { Bold = true };
             var boldCellStyle = new Sw.CellStyleDfn { Font = boldFont };
-            var boldAndRightCellStyle = new Sw.CellStyleDfn { Font = boldFont, HorizontalCellAlignment = Sw.HorizontalCellAlignment.Right };
-            var rightCellStyle = new Sw.CellStyleDfn { HorizontalCellAlignment = Sw.HorizontalCellAlignment.Right };
+            var boldAndRightCellStyle = new Sw.CellStyleDfn { Font = boldFont, Alignment = new Sw.CellAlignment { Horizontal = Sw.HorizontalCellAlignment.Right } };
+            var rightCellStyle = new Sw.CellStyleDfn { Alignment = new Sw.CellAlignment { Horizontal = Sw.HorizontalCellAlignment.Right } };
             var formatMMDDYY = new Sw.CellStyleNumFmt { formatCode = "mm-dd-yy" };
             var dateCellStyle = new Sw.CellStyleDfn { NumFmt = formatMMDDYY };
-            var dateAndBoldCellStyle = new Sw.CellStyleDfn { Font = boldFont, NumFmt = formatMMDDYY, HorizontalCellAlignment = Sw.HorizontalCellAlignment.Center };
+            var dateAndBoldCellStyle = new Sw.CellStyleDfn { Font = boldFont, NumFmt = formatMMDDYY, Alignment = new Sw.CellAlignment { Horizontal = Sw.HorizontalCellAlignment.Center } };
             Sw.WorkbookDfn wb = new Sw.WorkbookDfn
             {
                 Worksheets = new Sw.WorksheetDfn[]

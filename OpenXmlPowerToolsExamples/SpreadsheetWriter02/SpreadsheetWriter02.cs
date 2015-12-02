@@ -20,11 +20,11 @@ namespace SpreadsheetWriterExample
 
             var boldFont = new CellStyleFont { Bold = true };
             var boldCellStyle = new CellStyleDfn { Font = boldFont };
-            var boldAndRightCellStyle = new CellStyleDfn { Font = boldFont, HorizontalCellAlignment = HorizontalCellAlignment.Right };
-            var rightCellStyle = new CellStyleDfn { HorizontalCellAlignment = HorizontalCellAlignment.Right };
+            var boldAndRightCellStyle = new CellStyleDfn { Font = boldFont, Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Right } };
+            var rightCellStyle = new CellStyleDfn { Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Right } };
             var formatMMDDYY = new CellStyleNumFmt { formatCode = "mm-dd-yy" };
             var dateCellStyle = new CellStyleDfn { NumFmt = formatMMDDYY };
-            var dateAndBoldCellStyle = new CellStyleDfn { Font = boldFont, NumFmt = formatMMDDYY, HorizontalCellAlignment = HorizontalCellAlignment.Center };
+            var dateAndBoldCellStyle = new CellStyleDfn { Font = boldFont, NumFmt = formatMMDDYY, Alignment = new CellAlignment { Horizontal = HorizontalCellAlignment.Center } };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]
