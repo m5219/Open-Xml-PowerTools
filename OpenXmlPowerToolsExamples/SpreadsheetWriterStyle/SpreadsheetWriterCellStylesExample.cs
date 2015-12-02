@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using DocumentFormat.OpenXml.Packaging;
 using OpenXmlPowerTools;
 
 namespace SpreadsheetWriterExample
@@ -210,6 +209,7 @@ namespace SpreadsheetWriterExample
                 HorizontalCellAlignment = HorizontalCellAlignment.Center,
                 VerticalCellAlignment = VerticalCellAlignment.Center
             };
+            var wrapTextCellStyle = new CellStyleDfn { WrapText = true };
             WorkbookDfn wb = new WorkbookDfn
             {
                 Worksheets = new WorksheetDfn[]
@@ -293,6 +293,17 @@ namespace SpreadsheetWriterExample
                                         CellDataType = CellDataType.String,
                                         Value = "center",
                                         Style = centerCellStyle,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "wrap text\nnew line",
+                                        Style = wrapTextCellStyle,
                                     },
                                 }
                             },

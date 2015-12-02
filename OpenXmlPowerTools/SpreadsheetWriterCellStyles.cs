@@ -16,6 +16,7 @@ namespace OpenXmlPowerTools
     {
         public HorizontalCellAlignment? HorizontalCellAlignment;
         public VerticalCellAlignment? VerticalCellAlignment;
+        public bool? WrapText;
 
         public CellStyleNumFmt NumFmt;
         public CellStyleBorder Border;
@@ -123,6 +124,7 @@ namespace OpenXmlPowerTools
             XElement result = null;
             XAttribute ha = null;
             XAttribute va = null;
+            XAttribute wt = null;
             if (style.HorizontalCellAlignment != null)
             {
                 ha = new XAttribute(SSNoNamespace.horizontal, style.HorizontalCellAlignment.ToString().ToLower());
@@ -131,9 +133,13 @@ namespace OpenXmlPowerTools
             {
                 va = new XAttribute(NoNamespace.vertical, style.VerticalCellAlignment.ToString().ToLower());
             }
-            if (ha != null || va != null)
+            if (style.WrapText != null && style.WrapText == true)
             {
-                result = new XElement(S.alignment, ha, va);
+                wt = new XAttribute(NoNamespace.wrapText, 1);
+            }
+            if (ha != null || va != null || wt != null)
+            {
+                result = new XElement(S.alignment, ha, va, wt);
             }
             return result;
         }
