@@ -24,6 +24,9 @@ namespace SpreadsheetWriterExample
             FontExample(tempDi);
             NumFmtExample(tempDi);
 
+            // Formula
+            FormulaExample(tempDi);
+
             // row / column styles
             RowHeightExample(tempDi);
             ColWidthExample(tempDi);
@@ -1052,6 +1055,64 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "NumFmtExample.xlsx"), wb);
+        }
+
+        static void FormulaExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "Formula",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = 1,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = 2,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = 3,
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Formula = "SUM(A1:A3)",
+                                    },
+                                }
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "FormulaExample.xlsx"), wb);
         }
 
         static void RowHeightExample(DirectoryInfo dir)

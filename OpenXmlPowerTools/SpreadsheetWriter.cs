@@ -96,6 +96,7 @@ namespace OpenXmlPowerTools
             { "@",                        49  },
         };
         public object Value;
+        public string Formula;
         public CellDataType? CellDataType;
         public CellStyleDfn Style;
     }
@@ -500,6 +501,12 @@ namespace OpenXmlPowerTools
                             xw.WriteValue("str");
                             xw.WriteEndAttribute();
                             break;
+                    }
+                    if (cell.Formula != null)
+                    {
+                        xw.WriteStartElement("f", ns);
+                        xw.WriteValue(cell.Formula);
+                        xw.WriteEndElement();
                     }
                     if (cell.Value != null)
                     {
