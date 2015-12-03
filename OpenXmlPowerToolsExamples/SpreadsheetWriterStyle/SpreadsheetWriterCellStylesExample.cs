@@ -31,6 +31,7 @@ namespace SpreadsheetWriterExample
             RowHeightExample(tempDi);
             ColWidthExample(tempDi);
             ColAutoFitExample(tempDi);
+            ColAutoFitExample2(tempDi);
 
             // Write to MemoryStream
             WriteToStreamExample(tempDi);
@@ -1242,6 +1243,85 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "ColAutoFitExample.xlsx"), wb);
+        }
+
+        static void ColAutoFitExample2(DirectoryInfo dir)
+        {
+            var wrapTextCellStyle = new CellStyleDfn { Alignment = new CellAlignment { WrapText = true } };
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "ColAutoFit",
+                        Cols = new ColDfn[]
+                        {
+                            new ColDfn { AutoFit = new ColAutoFit() },
+                            new ColDfn { AutoFit = new ColAutoFit() },
+                            //If ColumnHeadings is less than Cols
+                            new ColDfn { AutoFit = new ColAutoFit() },
+                        },
+                        ColumnHeadings = new CellDfn[]
+                        {
+                            new CellDfn
+                            {
+                                Value = "one",
+                            },
+                            new CellDfn
+                            {
+                                Value = "two",
+                            },
+                        },
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "one",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "one",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "two",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "one",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "two",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "threeeeeeeeeeeeeeeeeeeeee",
+                                    },
+                                },
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "ColAutoFitExample2.xlsx"), wb);
         }
 
         static void WriteToStreamExample(DirectoryInfo dir)

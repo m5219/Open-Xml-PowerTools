@@ -421,14 +421,16 @@ namespace OpenXmlPowerTools
                         int index = 0;
                         foreach (var col in cols)
                         {
-                            if (col == null || col.AutoFit == null) continue;
-                            var list = new List<CellDfn>();
-                            if (worksheet.ColumnHeadings != null && worksheet.ColumnHeadings.Count() > index)
+                            if (col != null && col.AutoFit != null)
                             {
-                                list.AddRange(worksheet.ColumnHeadings.Skip(index).Take(1));
+                                var list = new List<CellDfn>();
+                                if (worksheet.ColumnHeadings != null && worksheet.ColumnHeadings.Count() > index)
+                                {
+                                    list.AddRange(worksheet.ColumnHeadings.Skip(index).Take(1));
+                                }
+                                list.AddRange(worksheet.Rows.Select(row => (row.Cells.Count() > index) ? row.Cells.Skip(index).Take(1).First() : (CellDfn)null));
+                                col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, scaleSize)).Where(w => w != null).Max();
                             }
-                            list.AddRange(worksheet.Rows.Select(row => (row.Cells.Count() > index) ? row.Cells.Skip(index).Take(1).First() : (CellDfn)null));
-                            col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, scaleSize)).Where(w => w != null).Max();
                             index++;
                         }
                     }
