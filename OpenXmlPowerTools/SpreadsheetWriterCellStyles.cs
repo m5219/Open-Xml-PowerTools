@@ -10,6 +10,13 @@ namespace OpenXmlPowerTools
     public class ColDfn
     {
         public decimal? Width;
+        public ColAutoFit AutoFit;
+    }
+
+    public class ColAutoFit
+    {
+        public decimal? MinWidth;
+        public decimal? MaxWidth;
     }
 
     public class CellStyleDfn : CellStyle

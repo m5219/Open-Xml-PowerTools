@@ -27,6 +27,7 @@ using System.Xml;
 using System.Xml.Linq;
 using DocumentFormat.OpenXml.Packaging;
 using OpenXmlPowerTools;
+using System.Drawing;
 
 namespace OpenXmlPowerTools
 {
@@ -308,7 +309,7 @@ namespace OpenXmlPowerTools
                     partXmlWriter.WriteStartElement("worksheet", ws);
                     if (worksheetData.Cols != null)
                     {
-                        SerializeCols(sDoc, partXmlWriter, worksheetData.Cols);
+                        SerializeCols(sDoc, partXmlWriter, worksheetData);
                     }
                     partXmlWriter.WriteStartElement("sheetData", ws);
 
@@ -370,40 +371,126 @@ namespace OpenXmlPowerTools
             sDoc.WorkbookPart.WorkbookStylesPart.Stylesheet.Save();
         }
 
-        private static void SerializeCols(SpreadsheetDocument sDoc, XmlWriter xw, IEnumerable<ColDfn> cols)
+        private static decimal? MeasureCellValueWidth(Graphics g, SpreadsheetDocument sDoc, CellDfn cell, Dictionary<int, Font> fonts, float scaleSize)
         {
+            if (cell.Value == null) return null;
+            Font font = fonts[0];
+            if (cell.Style != null && cell.Style.Font != null)
+            {
+                var fontStyle = cell.Style.Font;
+                XDocument sXDoc = sDoc.WorkbookPart.WorkbookStylesPart.GetXDocument();
+                var fontId = GetFontId(sXDoc, fontStyle);
+                if (fonts.ContainsKey(fontId))
+                {
+                    font = fonts[fontId];
+                }
+                else
+                {
+                    var fontName = (fontStyle.Name != null) ? fontStyle.Name : font.Name;
+                    var fontSize = (fontStyle.Size != null) ? (float)fontStyle.Size : font.Size;
+                    var fs = FontStyle.Regular;
+                    if (fontStyle.Bold == true) fs |= FontStyle.Bold;
+                    if (fontStyle.Italic == true) fs |= FontStyle.Italic;
+                    //if (UnderLine) fs |= FontStyle.Underline;
+                    //if (Strike) fs |= FontStyle.Strikeout;
+                    font = new Font(fontName, fontSize, fs);
+                    fonts[fontId] = font;
+                }
+            }
+
+            //FIXME want to use the formatted value
+            var width = g.MeasureString(cell.Value.ToString(), font, 1000, StringFormat.GenericTypographic).Width;
+            //FIXME not good size
+            width = (width + font.Size * 2) / scaleSize;
+            return (decimal)width;
+        }
+
+        private static void SerializeCols(SpreadsheetDocument sDoc, XmlWriter xw, WorksheetDfn worksheet)
+        {
+            var cols = worksheet.Cols;
+            if (cols.Where(col => col != null && col.AutoFit != null).Any())
+            {
+                var fonts = new Dictionary<int, Font>();
+                var scaleFont = new Font("Calibri", 11, FontStyle.Regular);
+                fonts[0] = scaleFont;
+                using (var b = new Bitmap(1, 1))
+                {
+                    using (var g = Graphics.FromImage(b))
+                    {
+                        float scaleSize = (float)Math.Truncate(g.MeasureString("AA", scaleFont, 1000, StringFormat.GenericTypographic).Width - g.MeasureString("A", scaleFont, 1000, StringFormat.GenericTypographic).Width);
+                        int index = 0;
+                        foreach (var col in cols)
+                        {
+                            if (col == null || col.AutoFit == null) continue;
+                            var list = new List<CellDfn>();
+                            if (worksheet.ColumnHeadings != null && worksheet.ColumnHeadings.Count() > index)
+                            {
+                                list.AddRange(worksheet.ColumnHeadings.Skip(index).Take(1));
+                            }
+                            list.AddRange(worksheet.Rows.Select(row => (row.Cells.Count() > index) ? row.Cells.Skip(index).Take(1).First() : (CellDfn)null));
+                            col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, scaleSize)).Where(w => w != null).Max();
+                            index++;
+                        }
+                    }
+                }
+            }
+
             string ns = S.s.NamespaceName;
 
             xw.WriteStartElement("cols", ns);
             int colIndex = 1;
             foreach (var col in cols)
             {
-                if (col != null && col.Width != null)
+                if (col != null)
                 {
-                    xw.WriteStartElement("col", ns);
+                    decimal? width = null;
+                    if (col.AutoFit != null && col.Width != null)
+                    {
+                        width = col.Width;
 
-                    // min
-                    xw.WriteStartAttribute("min");
-                    xw.WriteValue(colIndex);
-                    xw.WriteEndAttribute();
-                    // max
-                    xw.WriteStartAttribute("max");
-                    xw.WriteValue(colIndex);
-                    xw.WriteEndAttribute();
-                    // width
-                    xw.WriteStartAttribute("width");
-                    xw.WriteValue(col.Width);
-                    xw.WriteEndAttribute();
-                    // bestFit
-                    xw.WriteStartAttribute("bestFit");
-                    xw.WriteValue(1);
-                    xw.WriteEndAttribute();
-                    // customWidth
-                    xw.WriteStartAttribute("customWidth");
-                    xw.WriteValue(1);
-                    xw.WriteEndAttribute();
+                        if (col.AutoFit.MinWidth != null)
+                        {
+                            decimal minWidth = (decimal)col.AutoFit.MinWidth;
+                            width = Math.Max((decimal)width, minWidth);
+                        }
+                        if (col.AutoFit.MaxWidth != null)
+                        {
+                            decimal maxWidth = (decimal)col.AutoFit.MaxWidth;
+                            width = Math.Min((decimal)width, maxWidth);
+                        }
+                    }
+                    else //if (col.Width != null)
+                    {
+                        width = col.Width;
+                    }
 
-                    xw.WriteEndElement();
+                    if (width != null)
+                    {
+                        xw.WriteStartElement("col", ns);
+
+                        // min
+                        xw.WriteStartAttribute("min");
+                        xw.WriteValue(colIndex);
+                        xw.WriteEndAttribute();
+                        // max
+                        xw.WriteStartAttribute("max");
+                        xw.WriteValue(colIndex);
+                        xw.WriteEndAttribute();
+                        // width
+                        xw.WriteStartAttribute("width");
+                        xw.WriteValue(width);
+                        xw.WriteEndAttribute();
+                        // bestFit
+                        xw.WriteStartAttribute("bestFit");
+                        xw.WriteValue(1);
+                        xw.WriteEndAttribute();
+                        // customWidth
+                        xw.WriteStartAttribute("customWidth");
+                        xw.WriteValue(1);
+                        xw.WriteEndAttribute();
+
+                        xw.WriteEndElement();
+                    }
                 }
                 colIndex++;
             }

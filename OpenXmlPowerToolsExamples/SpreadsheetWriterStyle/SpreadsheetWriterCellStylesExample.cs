@@ -30,6 +30,7 @@ namespace SpreadsheetWriterExample
             // row / column styles
             RowHeightExample(tempDi);
             ColWidthExample(tempDi);
+            ColAutoFitExample(tempDi);
 
             // Write to MemoryStream
             WriteToStreamExample(tempDi);
@@ -1189,6 +1190,58 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "ColWidthExample.xlsx"), wb);
+        }
+
+        static void ColAutoFitExample(DirectoryInfo dir)
+        {
+            var wrapTextCellStyle = new CellStyleDfn { Alignment = new CellAlignment { WrapText =true } };
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "ColAutoFit",
+                        Cols = new ColDfn[]
+                        {
+                            new ColDfn { AutoFit = new ColAutoFit() },
+                            new ColDfn { AutoFit = new ColAutoFit() },
+                            new ColDfn { AutoFit = new ColAutoFit { MinWidth = 15 } },
+                            new ColDfn { AutoFit = new ColAutoFit { MaxWidth = 12 } },
+                        },
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "ABC",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Size = 11 } }
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "123,456,789",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Size = 24 } }
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "MinWidth",
+                                        Style = wrapTextCellStyle,
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "MaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaxWidth",
+                                        Style = wrapTextCellStyle,
+                                    },
+                                },
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "ColAutoFitExample.xlsx"), wb);
         }
 
         static void WriteToStreamExample(DirectoryInfo dir)
