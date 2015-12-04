@@ -22,6 +22,7 @@ namespace SpreadsheetWriterExample
             CellAlignmentExample(tempDi);
             FillExample(tempDi);
             FontExample(tempDi);
+            DefaultFontExample(tempDi);
             NumFmtExample(tempDi);
 
             // Formula
@@ -476,6 +477,57 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "FontExample.xlsx"), wb);
+        }
+
+        static void DefaultFontExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                DefaultFont = new CellStyleFont { Name = "Arial", Size = 14},
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "DefaultFont",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "default font",
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "font: Times New Roman",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Name = "Times New Roman"} },
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "font: Courier New",
+                                        Style = new CellStyleDfn { Font = new CellStyleFont { Name = "Courier New"} },
+                                    },
+                                }
+                            },
+                        }
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "DefaultFontExample.xlsx"), wb);
         }
 
         static void NumFmtExample(DirectoryInfo dir)

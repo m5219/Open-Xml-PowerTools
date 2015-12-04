@@ -40,6 +40,7 @@ namespace OpenXmlPowerTools
     public class WorkbookDfn
     {
         public IEnumerable<WorksheetDfn> Worksheets;
+        public CellStyleFont DefaultFont;
     }
 
     public class WorksheetDfn
@@ -228,12 +229,50 @@ namespace OpenXmlPowerTools
                     variant.Value = "1";
                 sDoc.ExtendedFilePropertiesPart.PutXDocument();
 
+                SetDefaultFont(sDoc, workbook.DefaultFont);
+                workbookPart.WorkbookStylesPart.PutXDocument();
+
                 if (workbook.Worksheets != null)
                     foreach (var worksheet in workbook.Worksheets)
                         AddWorksheet(sDoc, worksheet);
 
                 workbookPart.WorkbookStylesPart.PutXDocument();
             }
+        }
+
+        private static void SetDefaultFont(SpreadsheetDocument sDoc, CellStyleFont style)
+        {
+            if (style == null) style = new CellStyleFont();
+            if (style.Name == null) style.Name = "Calibri";
+            if (style.Size == null) style.Size = 11;
+
+            XDocument sXDoc = sDoc.WorkbookPart.WorkbookStylesPart.GetXDocument();
+            XElement fonts = sXDoc.Root.Element(S.fonts);
+            if (fonts == null)
+            {
+                fonts = new XElement(S.fonts,
+                    new XAttribute(SSNoNamespace.count, 1),
+                    CellStyleUtil.ToXElement(style));
+                sXDoc.Root.Add(fonts);
+            }
+            else
+            {
+                XElement font = fonts.Element(S.font);
+                font.Remove();
+                fonts.Add(CellStyleUtil.ToXElement(style));
+            }
+        }
+
+        private static CellStyleFont GetDefaultFont(SpreadsheetDocument sDoc)
+        {
+            XDocument sXDoc = sDoc.WorkbookPart.WorkbookStylesPart.GetXDocument();
+            XElement font = sXDoc.Root.Element(S.fonts).Element(S.font);
+            var result = new CellStyleFont {
+                id = 0,
+                Name = font.Element(S.name).Attribute("val").Value,
+                Size = uint.Parse(font.Element(S.sz).Attribute("val").Value),
+            };
+            return result;
         }
 
         public static void AddWorksheet(SpreadsheetDocument sDoc, WorksheetDfn worksheetData)
@@ -411,7 +450,8 @@ namespace OpenXmlPowerTools
             if (cols.Where(col => col != null && col.AutoFit != null).Any())
             {
                 var fonts = new Dictionary<int, Font>();
-                var scaleFont = new Font("Calibri", 11, FontStyle.Regular);
+                var defaultFont = GetDefaultFont(sDoc);
+                var scaleFont = new Font(defaultFont.Name, (int)defaultFont.Size, FontStyle.Regular);
                 fonts[0] = scaleFont;
                 using (var b = new Bitmap(1, 1))
                 {
