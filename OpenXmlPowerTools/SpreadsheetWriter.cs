@@ -437,7 +437,7 @@ namespace OpenXmlPowerTools
                 }
             }
 
-            //FIXME want to use the formatted value
+            //fit width to cell-value (not using cell.Style.NumFmt)
             string cellValue = null;
             if (cell.CellDataType == CellDataType.Date && cell.Value is DateTime)
             {
@@ -471,13 +471,22 @@ namespace OpenXmlPowerTools
                         {
                             if (col != null && col.AutoFit != null)
                             {
-                                var list = new List<CellDfn>();
-                                if (worksheet.ColumnHeadings != null && worksheet.ColumnHeadings.Count() > index)
+                                if (col.AutoFit.Standard == null)
                                 {
-                                    list.AddRange(worksheet.ColumnHeadings.Skip(index).Take(1));
+                                    //fit width to cell.Value
+                                    var list = new List<CellDfn>();
+                                    if (worksheet.ColumnHeadings != null && worksheet.ColumnHeadings.Count() > index)
+                                    {
+                                        list.AddRange(worksheet.ColumnHeadings.Skip(index).Take(1));
+                                    }
+                                    list.AddRange(worksheet.Rows.Select(row => (row.Cells.Count() > index) ? row.Cells.Skip(index).Take(1).First() : (CellDfn)null));
+                                    col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, scaleSize)).Where(w => w != null).Max();
                                 }
-                                list.AddRange(worksheet.Rows.Select(row => (row.Cells.Count() > index) ? row.Cells.Skip(index).Take(1).First() : (CellDfn)null));
-                                col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, scaleSize)).Where(w => w != null).Max();
+                                else
+                                {
+                                    //fit width to AutoFit.Standard.Value
+                                    col.Width = MeasureCellValueWidth(g, sDoc, col.AutoFit.Standard, fonts, scaleSize);
+                                }
                             }
                             index++;
                         }

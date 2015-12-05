@@ -1313,6 +1313,10 @@ namespace SpreadsheetWriterExample
                             new ColDfn { AutoFit = new ColAutoFit() },
                             //If ColumnHeadings is less than Cols
                             new ColDfn { AutoFit = new ColAutoFit() },
+                            //fit width to Standard.Value
+                            new ColDfn { AutoFit = new ColAutoFit { Standard = new CellDfn { Value = "0,000,000" } } },
+                            //fit width to cell.Value
+                            new ColDfn { AutoFit = new ColAutoFit() },
                         },
                         ColumnHeadings = new CellDfn[]
                         {
@@ -1380,6 +1384,27 @@ namespace SpreadsheetWriterExample
                                         CellDataType = CellDataType.Date,
                                         Value = new DateTime(2015, 12, 5),
                                         Style = new CellStyleDfn { NumFmt = new CellStyleNumFmt { formatCode = "mm-dd-yyyy" } },
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {},
+                                    new CellDfn {},
+                                    new CellDfn {},
+                                    //fit width to Standard.Value of ColDfn
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = 1234567,
+                                        Style = new CellStyleDfn { NumFmt = new CellStyleNumFmt { formatCode = "#,##0" } },
+                                    },
+                                    //fit width to cell.Value
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = 1234567,
+                                        Style = new CellStyleDfn { NumFmt = new CellStyleNumFmt { formatCode = "#,##0" } },
                                     },
                                 },
                             },

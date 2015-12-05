@@ -15,6 +15,7 @@ namespace OpenXmlPowerTools
 
     public class ColAutoFit
     {
+        public CellDfn Standard;
         public decimal? MinWidth;
         public decimal? MaxWidth;
     }
