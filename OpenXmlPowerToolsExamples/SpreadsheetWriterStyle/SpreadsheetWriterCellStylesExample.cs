@@ -1369,6 +1369,20 @@ namespace SpreadsheetWriterExample
                                     },
                                 },
                             },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        //if CellDataType is CellDataType.Date
+                                        //   and Value as DateTime
+                                        //then AutoFit-width size same as "mm-dd-yyyy" (using ToShortDateString())
+                                        CellDataType = CellDataType.Date,
+                                        Value = new DateTime(2015, 12, 5),
+                                        Style = new CellStyleDfn { NumFmt = new CellStyleNumFmt { formatCode = "mm-dd-yyyy" } },
+                                    },
+                                },
+                            },
                         }
                     }
                 }

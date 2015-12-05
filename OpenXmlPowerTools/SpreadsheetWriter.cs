@@ -438,7 +438,16 @@ namespace OpenXmlPowerTools
             }
 
             //FIXME want to use the formatted value
-            var width = g.MeasureString(cell.Value.ToString(), font, 1000, StringFormat.GenericTypographic).Width;
+            string cellValue = null;
+            if (cell.CellDataType == CellDataType.Date && cell.Value is DateTime)
+            {
+                cellValue = "00-00-0000";//(cell.Value as DateTime?).Value.ToShortDateString();
+            }
+            else
+            {
+                cellValue = cell.Value.ToString();
+            }
+            var width = g.MeasureString(cellValue, font, 1000, StringFormat.GenericTypographic).Width;
             width = (width + 5) / scaleSize;
             return (decimal)width;
         }
