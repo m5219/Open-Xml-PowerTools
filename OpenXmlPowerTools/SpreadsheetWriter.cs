@@ -439,8 +439,7 @@ namespace OpenXmlPowerTools
 
             //FIXME want to use the formatted value
             var width = g.MeasureString(cell.Value.ToString(), font, 1000, StringFormat.GenericTypographic).Width;
-            //FIXME not good size
-            width = (width + font.Size * 2) / scaleSize;
+            width = (width + 5) / scaleSize;
             return (decimal)width;
         }
 
@@ -457,7 +456,7 @@ namespace OpenXmlPowerTools
                 {
                     using (var g = Graphics.FromImage(b))
                     {
-                        float scaleSize = (float)Math.Truncate(g.MeasureString("AA", scaleFont, 1000, StringFormat.GenericTypographic).Width - g.MeasureString("A", scaleFont, 1000, StringFormat.GenericTypographic).Width);
+                        float scaleSize = (float)Math.Truncate(g.MeasureString("00", scaleFont, 1000, StringFormat.GenericTypographic).Width - g.MeasureString("0", scaleFont, 1000, StringFormat.GenericTypographic).Width);
                         int index = 0;
                         foreach (var col in cols)
                         {
