@@ -41,6 +41,8 @@ namespace OpenXmlPowerTools
     {
         public IEnumerable<WorksheetDfn> Worksheets;
         public CellStyleFont DefaultFont;
+        public string MeasureFallbackFontName;
+        public float? MeasureBaseSize;
     }
 
     public class WorksheetDfn
@@ -234,7 +236,7 @@ namespace OpenXmlPowerTools
 
                 if (workbook.Worksheets != null)
                     foreach (var worksheet in workbook.Worksheets)
-                        AddWorksheet(sDoc, worksheet);
+                        AddWorksheet(sDoc, worksheet, workbook);
 
                 workbookPart.WorkbookStylesPart.PutXDocument();
             }
@@ -275,7 +277,7 @@ namespace OpenXmlPowerTools
             return result;
         }
 
-        public static void AddWorksheet(SpreadsheetDocument sDoc, WorksheetDfn worksheetData)
+        public static void AddWorksheet(SpreadsheetDocument sDoc, WorksheetDfn worksheetData, WorkbookDfn workbookData = null)
         {
             Regex validSheetName = new Regex(@"^[^'*\[\]/\\:?][^*\[\]/\\:?]{0,30}$");
             if (!validSheetName.IsMatch(worksheetData.Name))
@@ -348,7 +350,7 @@ namespace OpenXmlPowerTools
                     partXmlWriter.WriteStartElement("worksheet", ws);
                     if (worksheetData.Cols != null)
                     {
-                        SerializeCols(sDoc, partXmlWriter, worksheetData);
+                        SerializeCols(sDoc, partXmlWriter, worksheetData, workbookData);
                     }
                     partXmlWriter.WriteStartElement("sheetData", ws);
 
@@ -410,7 +412,7 @@ namespace OpenXmlPowerTools
             sDoc.WorkbookPart.WorkbookStylesPart.Stylesheet.Save();
         }
 
-        private static decimal? MeasureCellValueWidth(Graphics g, SpreadsheetDocument sDoc, CellDfn cell, Dictionary<int, Font> fonts, float scaleSize)
+        private static decimal? MeasureCellValueWidth(Graphics g, SpreadsheetDocument sDoc, CellDfn cell, Dictionary<int, Font> fonts, float baseSize, string fallbackFontName)
         {
             if (cell.Value == null) return null;
             Font font = fonts[0];
@@ -433,6 +435,12 @@ namespace OpenXmlPowerTools
                     //if (UnderLine) fs |= FontStyle.Underline;
                     //if (Strike) fs |= FontStyle.Strikeout;
                     font = new Font(fontName, fontSize, fs);
+                    if (fallbackFontName != null && font.Name != font.OriginalFontName)
+                    {
+                        //fallback
+                        font.Dispose();
+                        font = new Font(fallbackFontName, fontSize, fs);
+                    }
                     fonts[fontId] = font;
                 }
             }
@@ -448,24 +456,39 @@ namespace OpenXmlPowerTools
                 cellValue = cell.Value.ToString();
             }
             var width = g.MeasureString(cellValue, font, 1000, StringFormat.GenericTypographic).Width;
-            width = (width + 5) / scaleSize;
+            width = (width + 5) / baseSize;
             return (decimal)width;
         }
 
-        private static void SerializeCols(SpreadsheetDocument sDoc, XmlWriter xw, WorksheetDfn worksheet)
+        private static void SerializeCols(SpreadsheetDocument sDoc, XmlWriter xw, WorksheetDfn worksheet, WorkbookDfn workbookData)
         {
             var cols = worksheet.Cols;
             if (cols.Where(col => col != null && col.AutoFit != null).Any())
             {
                 var fonts = new Dictionary<int, Font>();
                 var defaultFont = GetDefaultFont(sDoc);
-                var scaleFont = new Font(defaultFont.Name, (int)defaultFont.Size, FontStyle.Regular);
-                fonts[0] = scaleFont;
+                var baseFont = new Font(defaultFont.Name, (int)defaultFont.Size, FontStyle.Regular);
+                var fallbackFontName = (workbookData != null) ? workbookData.MeasureFallbackFontName : null;
+                if (fallbackFontName != null && baseFont.Name != baseFont.OriginalFontName)
+                {
+                    //fallback
+                    baseFont.Dispose();
+                    baseFont = new Font(fallbackFontName, (int)defaultFont.Size, FontStyle.Regular);
+                }
+                fonts[0] = baseFont;
                 using (var b = new Bitmap(1, 1))
                 {
                     using (var g = Graphics.FromImage(b))
                     {
-                        float scaleSize = (float)Math.Truncate(g.MeasureString("00", scaleFont, 1000, StringFormat.GenericTypographic).Width - g.MeasureString("0", scaleFont, 1000, StringFormat.GenericTypographic).Width);
+                        float baseSize;
+                        if (workbookData != null && workbookData.MeasureBaseSize != null)
+                        {
+                            baseSize = (float)workbookData.MeasureBaseSize;
+                        }
+                        else
+                        {
+                            baseSize = (float)Math.Truncate(g.MeasureString("00", baseFont, 1000, StringFormat.GenericTypographic).Width - g.MeasureString("0", baseFont, 1000, StringFormat.GenericTypographic).Width);
+                        }
                         int index = 0;
                         foreach (var col in cols)
                         {
@@ -480,12 +503,12 @@ namespace OpenXmlPowerTools
                                         list.AddRange(worksheet.ColumnHeadings.Skip(index).Take(1));
                                     }
                                     list.AddRange(worksheet.Rows.Select(row => (row.Cells.Count() > index) ? row.Cells.Skip(index).Take(1).First() : (CellDfn)null));
-                                    col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, scaleSize)).Where(w => w != null).Max();
+                                    col.Width = list.Where(cell => cell != null).Select(cell => MeasureCellValueWidth(g, sDoc, cell, fonts, baseSize, fallbackFontName)).Where(w => w != null).Max();
                                 }
                                 else
                                 {
                                     //fit width to AutoFit.Standard.Value
-                                    col.Width = MeasureCellValueWidth(g, sDoc, col.AutoFit.Standard, fonts, scaleSize);
+                                    col.Width = MeasureCellValueWidth(g, sDoc, col.AutoFit.Standard, fonts, baseSize, fallbackFontName);
                                 }
                             }
                             index++;
