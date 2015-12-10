@@ -38,6 +38,8 @@ namespace OpenXmlPowerTools
 
     public class CellStyle
     {
+        //index number of style-elements in styles.xml
+        //warning: Do not share CellStyle-instance with another workbook
         public int? id { get; protected internal set; }
     }
 

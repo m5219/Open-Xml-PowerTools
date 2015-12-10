@@ -1302,9 +1302,9 @@ namespace SpreadsheetWriterExample
             var wrapTextCellStyle = new CellStyleDfn { Alignment = new CellAlignment { WrapText = true } };
             WorkbookDfn wb = new WorkbookDfn
             {
-                DefaultFont = new CellStyleFont { Name = "aＭＳ ゴシック", Size = 11 },
-                //MeasureFallbackFontName = "Takaoゴシック",
-                MeasureFallbackFontName = "IPA モナー ゴシック",
+                DefaultFont = new CellStyleFont { Name = "ＭＳ ゴシック", Size = 11 },
+                MeasureFallbackFontName = "VL ゴシック",
+                MeasureBaseSize = 7,//DefaultFont's character-width
                 Worksheets = new WorksheetDfn[]
                 {
                     new WorksheetDfn
@@ -1326,7 +1326,7 @@ namespace SpreadsheetWriterExample
                             new CellDfn
                             {
                                 Value = "いろはにほへと",
-                                Style = new CellStyleDfn { Font = new CellStyleFont { Name = "ＭＳ ゴシック", Size = 11 } }
+                                Style = new CellStyleDfn { Font = new CellStyleFont { Name = "ＭＳ ゴシック", Size = 13 } }
                             },
                             new CellDfn
                             {

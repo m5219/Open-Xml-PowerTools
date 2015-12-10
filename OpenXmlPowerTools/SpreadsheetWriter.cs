@@ -680,7 +680,15 @@ namespace OpenXmlPowerTools
                     if (cell.Value != null)
                     {
                         xw.WriteStartElement("v", ns);
-                        xw.WriteValue(cell.Value);
+                        if (cell.CellDataType == CellDataType.Date && cell.Value is DateTime)
+                        {
+                            var dt = (DateTime)cell.Value;
+                            xw.WriteValue(dt.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss"));
+                        }
+                        else
+                        {
+                            xw.WriteValue(cell.Value);
+                        }
                         xw.WriteEndElement();
                     }
                     xw.WriteEndElement();
