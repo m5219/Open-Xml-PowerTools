@@ -36,6 +36,12 @@ namespace SpreadsheetWriterExample
 
             // Write to MemoryStream
             WriteToStreamExample(tempDi);
+
+#if ExecMemorySavingExample
+            // memory-saving
+            //OutOfMemory(tempDi);
+            MemorySaving(tempDi);
+#endif
         }
 
         static void BorderExample(DirectoryInfo dir)
@@ -1447,6 +1453,75 @@ namespace SpreadsheetWriterExample
             MemoryStream stream;
             SpreadsheetWriter.Write(out stream, wb);
             File.WriteAllBytes(Path.Combine(dir.FullName, "WriteToStreamExample.xlsx"), stream.ToArray());
+        }
+
+        static void OutOfMemory(DirectoryInfo dir)
+        {
+            var rows = new List<RowDfn>();
+            for (var r = 0; r < 30000; r++)
+            {
+                var row = new RowDfn();
+                var cells = new List<CellDfn>();
+                for (var c = 0; c < 1024; c++)
+                {
+                    var cell = new CellDfn {
+                        CellDataType = CellDataType.String,
+                        Value = string.Format("{0}-{1}", r + 1, c + 1),
+                    };
+                    cells.Add(cell);
+                }
+                row.Cells = cells.ToArray();
+                rows.Add(row);
+            }
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "OutOfMemory",
+                        Rows = rows.ToArray(),
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "OutOfMemory.xlsx"), wb);
+        }
+
+        static void MemorySaving(DirectoryInfo dir)
+        {
+            var list = new List<int>();
+            for (var r = 0; r < 30000; r++)
+            {
+                list.Add(r + 1);
+            }
+            var rows = new RowList<int>(list);
+            rows.ToRowDfn = (o) => {
+                var row = new RowDfn();
+                var cells = new List<CellDfn>();
+                for (var c = 0; c < 1024; c++)
+                {
+                    var cell = new CellDfn
+                    {
+                        CellDataType = CellDataType.String,
+                        Value = string.Format("{0}-{1}", Convert.ToInt32(o), c + 1),
+                    };
+                    cells.Add(cell);
+                }
+                row.Cells = cells.ToArray();
+                return row;
+            };
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "MemorySaving",
+                        Rows = rows,
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "MemorySaving.xlsx"), wb);
         }
     }
 }

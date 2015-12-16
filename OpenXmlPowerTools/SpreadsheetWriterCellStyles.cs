@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,30 @@ using System.Xml.Linq;
 
 namespace OpenXmlPowerTools
 {
+    public class RowList<T> : IEnumerable<RowDfn>
+    {
+        public List<T> List;
+        public Func<T, RowDfn> ToRowDfn = (o) => { return new RowDfn(); };
+
+        public RowList(List<T> list)
+        {
+            this.List = list;
+        }
+
+        public IEnumerator<RowDfn> GetEnumerator()
+        {
+            foreach (var o in List)
+            {
+                yield return ToRowDfn(o);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ColDfn
     {
         public decimal? Width;
