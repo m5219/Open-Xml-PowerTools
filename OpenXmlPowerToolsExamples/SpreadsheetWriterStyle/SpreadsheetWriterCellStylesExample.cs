@@ -28,6 +28,9 @@ namespace SpreadsheetWriterExample
             // Formula
             FormulaExample(tempDi);
 
+            // Comment
+            CommentExample(tempDi);
+
             // row / column styles
             RowHeightExample(tempDi);
             ColWidthExample(tempDi);
@@ -1173,6 +1176,59 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "FormulaExample.xlsx"), wb);
+        }
+
+        static void CommentExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "Comment",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "comment ->",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "comment2 ->",
+                                    },
+                                },
+                            },
+                        },
+                        Comments = new CellCommentDfn[]
+                        {
+                            new CellCommentDfn
+                            {
+                                CommentText = "Hello!",
+                                RowIndex = 0,
+                                ColIndex = 1
+                            },
+                            new CellCommentDfn
+                            {
+                                CommentText = "Thanks!",
+                                RowIndex = 1,
+                                ColIndex = 1
+                            }
+                        },
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "CommentExample.xlsx"), wb);
         }
 
         static void RowHeightExample(DirectoryInfo dir)

@@ -145,6 +145,26 @@ namespace OpenXmlPowerTools
         Decorative = 5,
     }
 
+    public class CellCommentDfn
+    {
+        //public string Author;
+        public string CommentText;
+        public int RowIndex; // 0 start
+        public int ColIndex; // 0 start
+        public string Reference => GetColumnName(ColIndex) + (RowIndex + 1).ToString();
+
+        private string GetColumnName(int index)
+        {
+            string str = "";
+            if (index < 0) return str;
+            do
+            {
+                str = Convert.ToChar(index % 26 + 0x41) + str;
+            } while ((index = index / 26 - 1) != -1);
+            return str;
+        }
+    }
+
     class CellStyleUtil
     {
         public static XElement CreateColorXElement(string color)

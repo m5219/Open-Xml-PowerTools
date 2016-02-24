@@ -52,6 +52,8 @@ namespace OpenXmlPowerTools
         public IEnumerable<ColDfn> Cols;
         public IEnumerable<CellDfn> ColumnHeadings;
         public IEnumerable<RowDfn> Rows;
+        public IEnumerable<CellCommentDfn> Comments;
+        public Func<string, string, string, string> CommentShapeXml;
     }
 
     public class RowDfn
@@ -405,6 +407,59 @@ namespace OpenXmlPowerTools
                                 new XAttribute(SSNoNamespace.showColumnStripes, 0)));
                         tXDoc.Add(table);
                         tdp.PutXDocument();
+                    }
+                    if (worksheetData.Comments != null)
+                    {
+                        partXmlWriter.WriteEndElement();
+                        string rId3 = "R" + Guid.NewGuid().ToString().Replace("-", "");
+                        partXmlWriter.WriteStartElement("legacyDrawing", ws);
+                        partXmlWriter.WriteStartAttribute("id", relns);
+                        partXmlWriter.WriteValue(rId3);
+                        VmlDrawingPart vpart = worksheetPart.AddNewPart<VmlDrawingPart>(rId3);
+                        using (var writer = new System.Xml.XmlTextWriter(vpart.GetStream(System.IO.FileMode.Create), System.Text.Encoding.UTF8))
+                        {
+                            writer.WriteRaw("<xml xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\">");
+                            foreach (var cdfn in worksheetData.Comments)
+                            {
+                                string shapeId = "#" + Guid.NewGuid().ToString().Replace("-", "");
+                                string shapeRow = cdfn.RowIndex.ToString();
+                                string shapeCol = cdfn.ColIndex.ToString();
+                                string shapeXml;
+                                if (worksheetData.CommentShapeXml == null)
+                                {
+                                    shapeXml = string.Format("<v:shape id =\"{0}\" type=\"#_x0000_t202\" style=\"position:absolute;margin-left:103.5pt;margin-top:1pt;width:96pt;height:58pt;z-index:1;visibility:hidden\" fillcolor=\"#ffffe1\" o:insetmode=\"auto\"><v:fill color2=\"#ffffe1\"/><v:shadow color=\"black\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style=\"mso-direction-alt:auto\"><div style=\"text-align:left\"></div></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>2,15,0,2,4,15,4,14</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{1}</x:Row><x:Column>{2}</x:Column></x:ClientData></v:shape>",
+                                        shapeId, shapeRow, shapeCol);
+                                }
+                                else
+                                {
+                                    shapeXml = worksheetData.CommentShapeXml(shapeId, shapeRow, shapeCol);
+                                }
+                                writer.WriteRaw(shapeXml);
+                            }
+                            writer.WriteRaw("</xml>");
+                            writer.Flush();
+                        }
+                        vpart.PutXDocument();
+                        var commentsPart = worksheetPart.AddNewPart<WorksheetCommentsPart>();
+                        commentsPart.Comments = new DocumentFormat.OpenXml.Spreadsheet.Comments();
+                        commentsPart.Comments.Authors = new DocumentFormat.OpenXml.Spreadsheet.Authors();
+                        commentsPart.Comments.Authors.AppendChild(new DocumentFormat.OpenXml.Spreadsheet.Author("Author"));
+                        commentsPart.Comments.CommentList = new DocumentFormat.OpenXml.Spreadsheet.CommentList();
+                        foreach (var cdfn in worksheetData.Comments)
+                        {
+                            if (cdfn != null)
+                            {
+                                var comment = new DocumentFormat.OpenXml.Spreadsheet.Comment
+                                {
+                                    AuthorId = 0,
+                                    //ShapeId = 0,
+                                    Reference = cdfn.Reference,
+                                    CommentText = new DocumentFormat.OpenXml.Spreadsheet.CommentText(new DocumentFormat.OpenXml.Spreadsheet.Run(new DocumentFormat.OpenXml.Spreadsheet.Text(cdfn.CommentText)))
+                                };
+                                commentsPart.Comments.CommentList.AppendChild(comment);
+                            }
+                        }
+                        commentsPart.Comments.Save();
                     }
                 }
             }
