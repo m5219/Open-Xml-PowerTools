@@ -149,6 +149,7 @@ namespace OpenXmlPowerTools
     {
         //public string Author;
         public string CommentText;
+        public Dictionary<string, string> ShapeStyle;
         public int RowIndex; // 0 start
         public int ColIndex; // 0 start
         public string Reference => GetColumnName(ColIndex) + (RowIndex + 1).ToString();
@@ -316,6 +317,12 @@ namespace OpenXmlPowerTools
                 xcolor,
                 xname,
                 xfamily);
+            return result;
+        }
+
+        public static string ToStyleString(Dictionary<string, string> dic)
+        {
+            var result = string.Join(";", dic.Select(x => x.Key + ":" + x.Value));
             return result;
         }
     }

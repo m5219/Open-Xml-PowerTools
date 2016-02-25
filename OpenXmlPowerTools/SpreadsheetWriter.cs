@@ -427,10 +427,13 @@ namespace OpenXmlPowerTools
                                     string shapeXml;
                                     if (worksheetData.CommentShapeXml == null)
                                     {
+                                        string shapeStyle = (cdfn.ShapeStyle != null)
+                                            ? CellStyleUtil.ToStyleString(cdfn.ShapeStyle)
+                                            : shapeStyle = "position:absolute;margin-left:103.5pt;margin-top:1pt;width:96pt;height:58pt;z-index:1;visibility:hidden";
                                         string shapeRow = cdfn.RowIndex.ToString();
                                         string shapeCol = cdfn.ColIndex.ToString();
-                                        shapeXml = string.Format("<v:shape id =\"{0}\" type=\"#_x0000_t202\" style=\"position:absolute;margin-left:103.5pt;margin-top:1pt;width:96pt;height:58pt;z-index:1;visibility:hidden\" fillcolor=\"#ffffe1\" o:insetmode=\"auto\"><v:fill color2=\"#ffffe1\"/><v:shadow color=\"black\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style=\"mso-direction-alt:auto\"><div style=\"text-align:left\"></div></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>2,15,0,2,4,15,4,14</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{1}</x:Row><x:Column>{2}</x:Column></x:ClientData></v:shape>",
-                                            shapeId, shapeRow, shapeCol);
+                                        shapeXml = string.Format("<v:shape id =\"{0}\" type=\"#_x0000_t202\" style=\"{1}\" fillcolor=\"#ffffe1\" o:insetmode=\"auto\"><v:fill color2=\"#ffffe1\"/><v:shadow color=\"black\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style=\"mso-direction-alt:auto\"><div style=\"text-align:left\"></div></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>2,15,0,2,4,15,4,14</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{2}</x:Row><x:Column>{3}</x:Column></x:ClientData></v:shape>",
+                                            shapeId, shapeStyle, shapeRow, shapeCol);
                                     }
                                     else
                                     {

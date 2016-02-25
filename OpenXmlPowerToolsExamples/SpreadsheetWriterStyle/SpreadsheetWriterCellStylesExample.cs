@@ -1209,6 +1209,16 @@ namespace SpreadsheetWriterExample
                                     },
                                 },
                             },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "custom shape style ->",
+                                    },
+                                },
+                            },
                         },
                         Comments = new CellCommentDfn[]
                         {
@@ -1223,7 +1233,22 @@ namespace SpreadsheetWriterExample
                                 CommentText = "Thanks!",
                                 RowIndex = 1,
                                 ColIndex = 1
-                            }
+                            },
+                            new CellCommentDfn
+                            {
+                                CommentText = "custom\nshape\nstyle",
+                                ShapeStyle = new Dictionary<string,string>() {
+                                    { "position", "absolute" },
+                                    { "margin-left", "103.5pt" },
+                                    { "margin-top", "1pt" },
+                                    { "width", "200pt" },
+                                    { "height", "30pt" },
+                                    { "z-index", "3" },
+                                    { "visibility", "visible" },
+                                },
+                                RowIndex = 2,
+                                ColIndex = 1
+                            },
                         },
                     }
                 }
