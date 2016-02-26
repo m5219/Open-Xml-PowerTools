@@ -148,8 +148,7 @@ namespace OpenXmlPowerTools
     public class CellCommentDfn
     {
         //public string Author;
-        public string CommentText;
-        public CellStyleFont Font;
+        public CommentTextDfn CommentText;
         public Dictionary<string, string> ShapeStyle;
         public AnchorDfn Anchor;
         public int RowIndex; // 0 start
@@ -184,6 +183,84 @@ namespace OpenXmlPowerTools
                 BottomOffset = (isFirstRow) ? 16 : 4
             };
             return result;
+        }
+    }
+
+    public class CommentTextDfn
+    {
+        private List<object> list;
+        private string _text;
+
+        public CommentTextDfn(string s)
+        {
+            _text = s;
+        }
+
+        public CommentTextDfn(object[] ar)
+        {
+            _append(ar);
+        }
+
+        public CommentTextDfn(IEnumerable<object> ar)
+        {
+            _append(ar);
+        }
+
+        public static implicit operator CommentTextDfn(string s) => new CommentTextDfn(s);
+
+        public string Text {
+            get
+            {
+                if (list == null) return _text;
+                string result = string.Join("", list.Where(x => x is string).Select(x => x as string));
+                return result;
+            }
+            set
+            {
+                _text = value;
+                list = null;
+            }
+        }
+
+        private CommentTextDfn _append(object o)
+        {
+            if (list == null) list = new List<object>();
+            list.Add(o);
+            return this;
+        }
+
+        private CommentTextDfn _append(IEnumerable<object> ar)
+        {
+            if (ar != null)
+            {
+                foreach (var o in ar)
+                {
+                    _append(o);
+                }
+            }
+            return this;
+        }
+
+        public CommentTextDfn Append(CellStyleFont f)
+        {
+            return _append(f);
+        }
+
+        public CommentTextDfn Append(string s)
+        {
+            return _append(s);
+        }
+
+        internal IEnumerable<object> GetEnumerable()
+        {
+            if (list == null)
+            {
+                yield return _text ?? "";
+            }
+            else
+            {
+                foreach (var o in list) yield return o;
+            }
         }
     }
 
@@ -373,6 +450,93 @@ namespace OpenXmlPowerTools
         {
             var result = string.Join(";", dic.Select(x => x.Key + ":" + x.Value));
             return result;
+        }
+
+        /// <summary>
+        /// if ct.GetEnumerable() return { string1, CellStyleFont1, string2, string3, CellStyleFont2, CellStyleFont3, string4 }
+        /// then CommentText inclue
+        ///     Run( Text(string1) )
+        ///     Run( RunProperties(CellStyleFont1), Text(string2) ))
+        ///     Run( Text(string3) )
+        ///     //not inclue CellStyleFont2
+        ///     Run( RunProperties(CellStyleFont3), Text(string4) ))
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public static DocumentFormat.OpenXml.Spreadsheet.CommentText ToCommentText(CommentTextDfn ct)
+        {
+            var commentText = new DocumentFormat.OpenXml.Spreadsheet.CommentText();
+            if (ct != null)
+            {
+                bool isPreserve = false;
+                CellStyleFont style = null;
+                string text = null;
+                Action<CellStyleFont, string> appendRun = (s,t) => {
+                    if (t == null) return;
+                    var run = CellStyleUtil.ToRun(s, t, isPreserve);
+                    commentText.Append(run);
+                    isPreserve = true;
+                    style = null;
+                    text = null;
+                };
+                foreach (var o in ct.GetEnumerable())
+                {
+                    if (o is CellStyleFont)
+                    {
+                        if (style != null) appendRun(style, text);
+                        style = o as CellStyleFont;
+                    }
+                    else if (o is string)
+                    {
+                        if (text != null) appendRun(style, text);
+                        text = o as string;
+                        appendRun(style, text);
+                    }
+                }
+                appendRun(style, text);
+            }
+
+            return commentText;
+        }
+
+        public static DocumentFormat.OpenXml.Spreadsheet.Run ToRun(CellStyleFont style, string text, bool isPreserve)
+        {
+            var run = new DocumentFormat.OpenXml.Spreadsheet.Run();
+            if (style != null)
+            {
+                var runProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
+                if (style.Bold == true)
+                {
+                    runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Bold());
+                }
+                if (style.Italic == true)
+                {
+                    runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Italic());
+                }
+                if (style.Size != null)
+                {
+                    runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.FontSize { Val = style.Size });
+                }
+                if (!string.IsNullOrEmpty(style.Color))
+                {
+                    runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = style.Color });
+                }
+                if (!string.IsNullOrEmpty(style.Name))
+                {
+                    runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.RunFont { Val = style.Name });
+                }
+                runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.RunPropertyCharSet { Val = 1 });
+                run.Append(runProperties);
+            }
+
+            var t = new DocumentFormat.OpenXml.Spreadsheet.Text(text ?? "");
+            if (isPreserve)
+            {
+                t.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
+            }
+            run.Append(t);
+
+            return run;
         }
     }
 }

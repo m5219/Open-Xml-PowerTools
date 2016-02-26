@@ -1215,6 +1215,16 @@ namespace SpreadsheetWriterExample
                                 {
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
+                                        Value = "Excel style ->",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
                                         Value = "custom shape style ->",
                                     },
                                 },
@@ -1230,16 +1240,33 @@ namespace SpreadsheetWriterExample
                             },
                             new CellCommentDfn
                             {
-                                CommentText = "Custom comment-text style",
-                                Font = new CellStyleFont
-                                {
-                                    Bold = true,
-                                    Italic = true,
-                                    Size = 16,
-                                    Color = "FFFF0000", //red
-                                    Name = "Tahoma",
-                                },
+                                CommentText = new CommentTextDfn(new object[] {
+                                    //Set alternately: CellStyleFont, comment-string, CellStyleFont, comment-string,...
+                                    new CellStyleFont
+                                    {
+                                        Bold = true,
+                                        Italic = true,
+                                        Size = 16,
+                                        Color = "FFFF0000", //red
+                                        Name = "Tahoma",
+                                    },
+                                    "Custom comment-text style",
+                                }),
                                 RowIndex = 1,
+                                ColIndex = 1
+                            },
+                            new CellCommentDfn
+                            {
+                                CommentText = new CommentTextDfn(new object[] {
+                                    new CellStyleFont
+                                    {
+                                        Bold = true,
+                                    },
+                                    "Author:",
+                                    new CellStyleFont(),
+                                    "\ncomment...",
+                                }),
+                                RowIndex = 2,
                                 ColIndex = 1
                             },
                             new CellCommentDfn
@@ -1251,7 +1278,7 @@ namespace SpreadsheetWriterExample
                                     { "margin-top", "21.5pt" },
                                     { "width", "211pt" },
                                     { "height", "31pt" },
-                                    { "z-index", "3" },
+                                    { "z-index", "4" },
                                     { "visibility", "visible" },
                                 },
                                 Anchor = new AnchorDfn {
@@ -1264,7 +1291,7 @@ namespace SpreadsheetWriterExample
                                     BottomRow = 3,
                                     BottomOffset = 18
                                 },
-                                RowIndex = 2,
+                                RowIndex = 3,
                                 ColIndex = 1
                             },
                         },

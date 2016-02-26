@@ -458,41 +458,12 @@ namespace OpenXmlPowerTools
                         {
                             if (cdfn != null)
                             {
-                                var run = new DocumentFormat.OpenXml.Spreadsheet.Run();
-                                if (cdfn.Font != null)
-                                {
-                                    var commentStyle = cdfn.Font;
-                                    var runProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
-                                    if (commentStyle.Bold == true)
-                                    {
-                                        runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Bold());
-                                    }
-                                    if (commentStyle.Italic == true)
-                                    {
-                                        runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Italic());
-                                    }
-                                    if (commentStyle.Size != null)
-                                    {
-                                        runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.FontSize { Val = commentStyle.Size });
-                                    }
-                                    if (!string.IsNullOrEmpty(commentStyle.Color))
-                                    {
-                                        runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = commentStyle.Color });
-                                    }
-                                    if (!string.IsNullOrEmpty(commentStyle.Name))
-                                    {
-                                        runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.RunFont { Val = commentStyle.Name });
-                                    }
-                                    runProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.RunPropertyCharSet { Val = 1 });
-                                    run.Append(runProperties);
-                                }
-                                run.Append(new DocumentFormat.OpenXml.Spreadsheet.Text(cdfn.CommentText));
                                 var comment = new DocumentFormat.OpenXml.Spreadsheet.Comment
                                 {
                                     AuthorId = 0,
                                     //ShapeId = 0,
                                     Reference = cdfn.Reference,
-                                    CommentText = new DocumentFormat.OpenXml.Spreadsheet.CommentText(run)
+                                    CommentText = CellStyleUtil.ToCommentText(cdfn.CommentText),
                                 };
                                 commentsPart.Comments.CommentList.AppendChild(comment);
                             }
