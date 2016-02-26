@@ -1236,15 +1236,25 @@ namespace SpreadsheetWriterExample
                             },
                             new CellCommentDfn
                             {
-                                CommentText = "custom\nshape\nstyle",
+                                CommentText = "Custom shape style:\nThe quick brown fox jumps over the lazy dog",
                                 ShapeStyle = new Dictionary<string,string>() {
                                     { "position", "absolute" },
-                                    { "margin-left", "103.5pt" },
-                                    { "margin-top", "1pt" },
-                                    { "width", "200pt" },
-                                    { "height", "30pt" },
+                                    { "margin-left", "151.5pt" },
+                                    { "margin-top", "21.5pt" },
+                                    { "width", "211pt" },
+                                    { "height", "31pt" },
                                     { "z-index", "3" },
                                     { "visibility", "visible" },
+                                },
+                                Anchor = new AnchorDfn {
+                                    LeftColumn = 3,
+                                    LeftOffset = 15,
+                                    TopRow = 1,
+                                    TopOffset = 14,
+                                    RightColumn = 7,
+                                    RightOffset = 53,
+                                    BottomRow = 3,
+                                    BottomOffset = 18
                                 },
                                 RowIndex = 2,
                                 ColIndex = 1

@@ -150,6 +150,7 @@ namespace OpenXmlPowerTools
         //public string Author;
         public string CommentText;
         public Dictionary<string, string> ShapeStyle;
+        public AnchorDfn Anchor;
         public int RowIndex; // 0 start
         public int ColIndex; // 0 start
         public string Reference => GetColumnName(ColIndex) + (RowIndex + 1).ToString();
@@ -163,6 +164,53 @@ namespace OpenXmlPowerTools
                 str = Convert.ToChar(index % 26 + 0x41) + str;
             } while ((index = index / 26 - 1) != -1);
             return str;
+        }
+
+        public AnchorDfn CreateAnchor()
+        {
+            bool isFirstRow = (RowIndex <= 0);
+            int top = (isFirstRow) ? 0 : RowIndex - 1;
+            int left = ColIndex + 1;
+            var result = new AnchorDfn
+            {
+                LeftColumn = left,
+                LeftOffset = 15,
+                TopRow = top,
+                TopOffset = (isFirstRow) ? 2 : 19,
+                RightColumn = left + 2,
+                RightOffset = 15,
+                BottomRow = left + 4,
+                BottomOffset = (isFirstRow) ? 5 : 22
+            };
+            return result;
+        }
+    }
+
+    public class AnchorDfn
+    {
+        public int LeftColumn;
+        public int LeftOffset;
+        public int TopRow;
+        public int TopOffset;
+        public int RightColumn;
+        public int RightOffset;
+        public int BottomRow;
+        public int BottomOffset;
+
+        public override string ToString()
+        {
+            var result = string.Join(",",
+                new string[] {
+                    LeftColumn.ToString(),
+                    LeftOffset.ToString(),
+                    TopRow.ToString(),
+                    TopOffset.ToString(),
+                    RightColumn.ToString(),
+                    RightOffset.ToString(),
+                    BottomRow.ToString(),
+                    BottomOffset.ToString()
+                });
+            return result;
         }
     }
 
