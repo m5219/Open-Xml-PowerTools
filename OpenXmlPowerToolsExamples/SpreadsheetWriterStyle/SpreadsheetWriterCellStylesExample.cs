@@ -1205,7 +1205,7 @@ namespace SpreadsheetWriterExample
                                 {
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
-                                        Value = "comment2 ->",
+                                        Value = "custom comment-text style ->",
                                     },
                                 },
                             },
@@ -1224,13 +1224,23 @@ namespace SpreadsheetWriterExample
                         {
                             new CellCommentDfn
                             {
-                                CommentText = "Hello!",
+                                CommentText = "Hello!\nThanks!",
                                 RowIndex = 0,
                                 ColIndex = 1
                             },
                             new CellCommentDfn
                             {
-                                CommentText = "Thanks!",
+                                CommentText = "Custom comment-text style",
+                                //https://msdn.microsoft.com/library/documentformat.openxml.wordprocessing.runproperties.aspx
+                                CommentTextStyle = new DocumentFormat.OpenXml.Spreadsheet.RunProperties(new DocumentFormat.OpenXml.OpenXmlElement[]
+                                {
+                                    new DocumentFormat.OpenXml.Spreadsheet.Bold(),
+                                    new DocumentFormat.OpenXml.Spreadsheet.FontSize { Val = 16 },
+                                    new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = "FFFF0000" },//red
+                                    new DocumentFormat.OpenXml.Spreadsheet.RunFont { Val = "Tahoma" },
+                                    //https://msdn.microsoft.com/library/documentformat.openxml.spreadsheet.runpropertycharset.aspx
+                                    new DocumentFormat.OpenXml.Spreadsheet.RunPropertyCharSet { Val = 1 },
+                                }),
                                 RowIndex = 1,
                                 ColIndex = 1
                             },

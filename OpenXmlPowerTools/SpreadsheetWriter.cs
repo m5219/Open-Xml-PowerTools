@@ -458,12 +458,18 @@ namespace OpenXmlPowerTools
                         {
                             if (cdfn != null)
                             {
+                                var run = new DocumentFormat.OpenXml.Spreadsheet.Run();
+                                if (cdfn.CommentTextStyle != null)
+                                {
+                                    run.Append(cdfn.CommentTextStyle);
+                                }
+                                run.Append(new DocumentFormat.OpenXml.Spreadsheet.Text(cdfn.CommentText));
                                 var comment = new DocumentFormat.OpenXml.Spreadsheet.Comment
                                 {
                                     AuthorId = 0,
                                     //ShapeId = 0,
                                     Reference = cdfn.Reference,
-                                    CommentText = new DocumentFormat.OpenXml.Spreadsheet.CommentText(new DocumentFormat.OpenXml.Spreadsheet.Run(new DocumentFormat.OpenXml.Spreadsheet.Text(cdfn.CommentText)))
+                                    CommentText = new DocumentFormat.OpenXml.Spreadsheet.CommentText(run)
                                 };
                                 commentsPart.Comments.CommentList.AppendChild(comment);
                             }

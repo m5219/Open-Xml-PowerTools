@@ -149,6 +149,7 @@ namespace OpenXmlPowerTools
     {
         //public string Author;
         public string CommentText;
+        public DocumentFormat.OpenXml.Spreadsheet.RunProperties CommentTextStyle;
         public Dictionary<string, string> ShapeStyle;
         public AnchorDfn Anchor;
         public int RowIndex; // 0 start
@@ -176,11 +177,11 @@ namespace OpenXmlPowerTools
                 LeftColumn = left,
                 LeftOffset = 15,
                 TopRow = top,
-                TopOffset = (isFirstRow) ? 2 : 19,
+                TopOffset = (isFirstRow) ? 2 : 10,
                 RightColumn = left + 2,
                 RightOffset = 15,
-                BottomRow = left + 4,
-                BottomOffset = (isFirstRow) ? 5 : 22
+                BottomRow = left + 3,
+                BottomOffset = (isFirstRow) ? 16 : 4
             };
             return result;
         }
