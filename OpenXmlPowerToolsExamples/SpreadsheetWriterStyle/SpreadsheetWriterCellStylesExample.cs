@@ -1231,16 +1231,14 @@ namespace SpreadsheetWriterExample
                             new CellCommentDfn
                             {
                                 CommentText = "Custom comment-text style",
-                                //https://msdn.microsoft.com/library/documentformat.openxml.wordprocessing.runproperties.aspx
-                                CommentTextStyle = new DocumentFormat.OpenXml.Spreadsheet.RunProperties(new DocumentFormat.OpenXml.OpenXmlElement[]
+                                Font = new CellStyleFont
                                 {
-                                    new DocumentFormat.OpenXml.Spreadsheet.Bold(),
-                                    new DocumentFormat.OpenXml.Spreadsheet.FontSize { Val = 16 },
-                                    new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = "FFFF0000" },//red
-                                    new DocumentFormat.OpenXml.Spreadsheet.RunFont { Val = "Tahoma" },
-                                    //https://msdn.microsoft.com/library/documentformat.openxml.spreadsheet.runpropertycharset.aspx
-                                    new DocumentFormat.OpenXml.Spreadsheet.RunPropertyCharSet { Val = 1 },
-                                }),
+                                    Bold = true,
+                                    Italic = true,
+                                    Size = 16,
+                                    Color = "FFFF0000", //red
+                                    Name = "Tahoma",
+                                },
                                 RowIndex = 1,
                                 ColIndex = 1
                             },

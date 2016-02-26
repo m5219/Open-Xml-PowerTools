@@ -149,7 +149,7 @@ namespace OpenXmlPowerTools
     {
         //public string Author;
         public string CommentText;
-        public DocumentFormat.OpenXml.Spreadsheet.RunProperties CommentTextStyle;
+        public CellStyleFont Font;
         public Dictionary<string, string> ShapeStyle;
         public AnchorDfn Anchor;
         public int RowIndex; // 0 start
