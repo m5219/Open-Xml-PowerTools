@@ -468,14 +468,12 @@ namespace OpenXmlPowerTools
             var commentText = new DocumentFormat.OpenXml.Spreadsheet.CommentText();
             if (ct != null)
             {
-                bool isPreserve = false;
                 CellStyleFont style = null;
                 string text = null;
                 Action<CellStyleFont, string> appendRun = (s,t) => {
                     if (t == null) return;
-                    var run = CellStyleUtil.ToRun(s, t, isPreserve);
+                    var run = CellStyleUtil.ToRun(s, t, isPreserve:true);
                     commentText.Append(run);
-                    isPreserve = true;
                     style = null;
                     text = null;
                 };
@@ -488,12 +486,10 @@ namespace OpenXmlPowerTools
                     }
                     else if (o is string)
                     {
-                        if (text != null) appendRun(style, text);
                         text = o as string;
                         appendRun(style, text);
                     }
                 }
-                appendRun(style, text);
             }
 
             return commentText;
