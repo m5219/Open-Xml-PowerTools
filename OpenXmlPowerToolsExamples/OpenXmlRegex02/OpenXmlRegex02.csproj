@@ -32,15 +32,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Open-Xml-Sdk\DocumentFormat.OpenXml\bin\Debug\DocumentFormat.OpenXml.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\OpenXMLSDK-MOT.2.6.0.0\lib\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Packaging">
-      <HintPath>..\..\..\Open-Xml-Sdk\DocumentFormat.OpenXml\bin\Debug\System.IO.Packaging.dll</HintPath>
+    <Reference Include="System.IO.Packaging, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\OpenXMLSDK-MOT.2.6.0.0\lib\System.IO.Packaging.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OpenXmlPowerTools\OpenXmlPowerTools.csproj">
