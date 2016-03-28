@@ -1196,11 +1196,31 @@ namespace SpreadsheetWriterExample
                                 {
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
+                                        Value = "whole",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "decimal",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
                                         Value = "list",
                                     },
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
-                                        Value = "selected",
+                                        Value = "date",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "time",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "textLength",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "custom",
                                     },
                                 }
                             },
@@ -1214,7 +1234,27 @@ namespace SpreadsheetWriterExample
                                     },
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
-                                        Value = "22222",
+                                        Value = "",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "",
                                     },
                                 }
                             },
@@ -1222,19 +1262,70 @@ namespace SpreadsheetWriterExample
                         DataValidations = new DataValidationDfn[] {
                             new DataValidationDfn
                             {
-                                AllowBlank = true,
-                                ShowInputMessage = true,
-                                ShowErrorMessage = true,
-                                Formula = "NameOfRange1",
                                 ReferenceSequence = "A2",
+                                Type = DataValidationType.whole,
+                                AllowBlank = true,
+                                Operator = DataValidationOperator.between,
+                                Formula1 = "1",
+                                Formula2 = "100",
+                                PromptTitle = "Type: whole",
+                                PromptMessage = "Please enter a number between 1 and 100",
                             },
                             new DataValidationDfn
                             {
-                                AllowBlank = true,
-                                ShowInputMessage = true,
-                                ShowErrorMessage = true,
-                                Formula = "NameOfRange2",
                                 ReferenceSequence = "B2",
+                                Type = DataValidationType.@decimal,
+                                AllowBlank = true,
+                                Operator = DataValidationOperator.greaterThanOrEqual,
+                                Formula1 = "0",
+                                PromptTitle = "Type: decimal",
+                                PromptMessage = "Please enter a number of 0 or more",
+                            },
+                            new DataValidationDfn
+                            {
+                                ReferenceSequence = "C2",
+                                Type = DataValidationType.list,
+                                AllowBlank = true,
+                                Formula1 = "NameOfRange1",
+                            },
+                            new DataValidationDfn
+                            {
+                                ReferenceSequence = "D2",
+                                Type = DataValidationType.date,
+                                AllowBlank = true,
+                                Operator = DataValidationOperator.greaterThan,
+                                Formula1 = "1",
+                                PromptTitle = "Type: date",
+                                PromptMessage = "Please enter a date",
+                            },
+                            new DataValidationDfn
+                            {
+                                ReferenceSequence = "E2",
+                                Type = DataValidationType.time,
+                                AllowBlank = true,
+                                Operator = DataValidationOperator.greaterThan,
+                                Formula1 = "0",
+                                PromptTitle = "Type: time",
+                                PromptMessage = "Please enter a time",
+                            },
+                            new DataValidationDfn
+                            {
+                                ReferenceSequence = "F2",
+                                Type = DataValidationType.textLength,
+                                AllowBlank = true,
+                                Operator = DataValidationOperator.lessThan,
+                                Formula1 = "26",
+                                PromptTitle = "Type: textLength",
+                                PromptMessage = "Please enter your name (max 25 characters)",
+                            },
+                            new DataValidationDfn
+                            {
+                                ReferenceSequence = "G2",
+                                Type = DataValidationType.custom,
+                                AllowBlank = true,
+                                Formula1 = "=LEN(G2)=LENB(G2)",
+                                PromptTitle = "Type: textLength",
+                                PromptMessage = "Please enter your name (one-byte character only)",
                             },
                         },
                     },
@@ -1251,10 +1342,6 @@ namespace SpreadsheetWriterExample
                                         CellDataType = CellDataType.String,
                                         Value = "Name of range 1",
                                     },
-                                    new CellDfn {
-                                        CellDataType = CellDataType.String,
-                                        Value = "Name of range 2",
-                                    },
                                 }
                             },
                             new RowDfn
@@ -1264,10 +1351,6 @@ namespace SpreadsheetWriterExample
                                     new CellDfn {
                                         CellDataType = CellDataType.String,
                                         Value = "AAAAA",
-                                    },
-                                    new CellDfn {
-                                        CellDataType = CellDataType.String,
-                                        Value = "11111",
                                     },
                                 }
                             },
@@ -1279,10 +1362,6 @@ namespace SpreadsheetWriterExample
                                         CellDataType = CellDataType.String,
                                         Value = "BBBBB",
                                     },
-                                    new CellDfn {
-                                        CellDataType = CellDataType.String,
-                                        Value = "22222",
-                                    },
                                 }
                             },
                             new RowDfn
@@ -1293,10 +1372,6 @@ namespace SpreadsheetWriterExample
                                         CellDataType = CellDataType.String,
                                         Value = "CCCCC",
                                     },
-                                    new CellDfn {
-                                        CellDataType = CellDataType.String,
-                                        Value = "33333",
-                                    },
                                 }
                             },
                         }
@@ -1304,7 +1379,6 @@ namespace SpreadsheetWriterExample
                 },
                 DefinedNames = new DefinedNameDfn[] {
                     new DefinedNameDfn { Name = "NameOfRange1", Text = "DefinedNameSheet!$A$2:$A$4" },
-                    new DefinedNameDfn { Name = "NameOfRange2", Text = "DefinedNameSheet!$B$2:$B$4" },
                 },
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "DefinedNameAndDataValidationExample.xlsx"), wb);

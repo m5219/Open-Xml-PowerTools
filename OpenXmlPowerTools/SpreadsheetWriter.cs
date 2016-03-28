@@ -66,11 +66,47 @@ namespace OpenXmlPowerTools
 
     public class DataValidationDfn
     {
+        public DataValidationType Type;
+        public DataValidationOperator? Operator;
         public bool AllowBlank;
-        public bool ShowInputMessage;
-        public bool ShowErrorMessage;
-        public string Formula;
+        public string PromptTitle;
+        public string PromptMessage;
+        public DataValidationErrorStyle? ErrorStyle;
+        public string ErrorTitle;
+        public string ErrorMessage;
+        public string Formula1;
+        public string Formula2;
         public string ReferenceSequence;
+    }
+
+    public enum DataValidationType
+    {
+        whole,
+        @decimal,
+        list,
+        date,
+        time,
+        textLength,
+        custom,
+    }
+
+    public enum DataValidationOperator
+    {
+        between,
+        notBetween,
+        equal,
+        notEqual,
+        greaterThan,
+        lessThan,
+        greaterThanOrEqual,
+        lessThanOrEqual,
+    }
+
+    public enum DataValidationErrorStyle
+    {
+        stop,
+        warning,
+        information,
     }
 
     public class RowDfn
@@ -511,17 +547,51 @@ namespace OpenXmlPowerTools
                             {
                                 partXmlWriter.WriteStartElement("dataValidation", ws);
                                 partXmlWriter.WriteStartAttribute("type");
-                                partXmlWriter.WriteValue("list");
+                                partXmlWriter.WriteValue(dv.Type.ToString());
+                                if (dv.Operator != null)
+                                {
+                                    partXmlWriter.WriteStartAttribute("operator");
+                                    partXmlWriter.WriteValue(dv.Operator.ToString());
+                                }
                                 partXmlWriter.WriteStartAttribute("allowBlank");
                                 partXmlWriter.WriteValue((dv.AllowBlank)? "1" : "0");
                                 partXmlWriter.WriteStartAttribute("showInputMessage");
-                                partXmlWriter.WriteValue((dv.ShowInputMessage) ? "1" : "0");
+                                partXmlWriter.WriteValue("1");
+                                if (!string.IsNullOrEmpty(dv.PromptTitle))
+                                {
+                                    partXmlWriter.WriteStartAttribute("promptTitle");
+                                    partXmlWriter.WriteValue(dv.PromptTitle);
+                                }
+                                if (!string.IsNullOrEmpty(dv.PromptMessage))
+                                {
+                                    partXmlWriter.WriteStartAttribute("prompt");
+                                    partXmlWriter.WriteValue(dv.PromptMessage);
+                                }
                                 partXmlWriter.WriteStartAttribute("showErrorMessage");
-                                partXmlWriter.WriteValue((dv.ShowErrorMessage) ? "1" : "0");
+                                partXmlWriter.WriteValue("1");
+                                if (dv.ErrorStyle != null)
+                                {
+                                    partXmlWriter.WriteStartAttribute("errorStyle");
+                                    partXmlWriter.WriteValue(dv.ErrorStyle.ToString());
+                                }
+                                if (!string.IsNullOrEmpty(dv.ErrorTitle))
+                                {
+                                    partXmlWriter.WriteStartAttribute("errorTitle");
+                                    partXmlWriter.WriteValue(dv.ErrorTitle);
+                                }
+                                if (!string.IsNullOrEmpty(dv.ErrorMessage))
+                                {
+                                    partXmlWriter.WriteStartAttribute("error");
+                                    partXmlWriter.WriteValue(dv.ErrorMessage);
+                                }
                                 partXmlWriter.WriteStartAttribute("sqref");
                                 partXmlWriter.WriteValue(dv.ReferenceSequence);
                                 partXmlWriter.WriteEndAttribute();
-                                partXmlWriter.WriteElementString("formula1", dv.Formula);
+                                partXmlWriter.WriteElementString("formula1", dv.Formula1);
+                                if (!string.IsNullOrEmpty(dv.Formula2))
+                                {
+                                    partXmlWriter.WriteElementString("formula2", dv.Formula1);
+                                }
                                 partXmlWriter.WriteEndElement();
                             }
                         }
