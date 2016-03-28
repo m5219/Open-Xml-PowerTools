@@ -27,6 +27,7 @@ namespace SpreadsheetWriterExample
 
             // Formula
             FormulaExample(tempDi);
+            DefinedNameAndDataValidationExample(tempDi);
 
             // Comment
             CommentExample(tempDi);
@@ -1176,6 +1177,137 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "FormulaExample.xlsx"), wb);
+        }
+
+        static void DefinedNameAndDataValidationExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "DataValidation",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "list",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "selected",
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "22222",
+                                    },
+                                }
+                            },
+                        },
+                        DataValidations = new DataValidationDfn[] {
+                            new DataValidationDfn
+                            {
+                                AllowBlank = true,
+                                ShowInputMessage = true,
+                                ShowErrorMessage = true,
+                                Formula = "NameOfRange1",
+                                ReferenceSequence = "A2",
+                            },
+                            new DataValidationDfn
+                            {
+                                AllowBlank = true,
+                                ShowInputMessage = true,
+                                ShowErrorMessage = true,
+                                Formula = "NameOfRange2",
+                                ReferenceSequence = "B2",
+                            },
+                        },
+                    },
+                    new WorksheetDfn
+                    {
+                        Name = "DefinedNameSheet",
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "Name of range 1",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "Name of range 2",
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "AAAAA",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "11111",
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "BBBBB",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "22222",
+                                    },
+                                }
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "CCCCC",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.String,
+                                        Value = "33333",
+                                    },
+                                }
+                            },
+                        }
+                    },
+                },
+                DefinedNames = new DefinedNameDfn[] {
+                    new DefinedNameDfn { Name = "NameOfRange1", Text = "DefinedNameSheet!$A$2:$A$4" },
+                    new DefinedNameDfn { Name = "NameOfRange2", Text = "DefinedNameSheet!$B$2:$B$4" },
+                },
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "DefinedNameAndDataValidationExample.xlsx"), wb);
         }
 
         static void CommentExample(DirectoryInfo dir)

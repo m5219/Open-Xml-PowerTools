@@ -43,6 +43,13 @@ namespace OpenXmlPowerTools
         public CellStyleFont DefaultFont;
         public string MeasureFallbackFontName;
         public float? MeasureBaseSize;
+        public IEnumerable<DefinedNameDfn> DefinedNames;
+    }
+
+    public class DefinedNameDfn
+    {
+        public string Name;
+        public string Text;
     }
 
     public class WorksheetDfn
@@ -54,6 +61,16 @@ namespace OpenXmlPowerTools
         public IEnumerable<RowDfn> Rows;
         public IEnumerable<CellCommentDfn> Comments;
         public Func<string, CellCommentDfn, string> CommentShapeXml;
+        public IEnumerable<DataValidationDfn> DataValidations;
+    }
+
+    public class DataValidationDfn
+    {
+        public bool AllowBlank;
+        public bool ShowInputMessage;
+        public bool ShowErrorMessage;
+        public string Formula;
+        public string ReferenceSequence;
     }
 
     public class RowDfn
@@ -241,6 +258,18 @@ namespace OpenXmlPowerTools
                         AddWorksheet(sDoc, worksheet, workbook);
 
                 workbookPart.WorkbookStylesPart.PutXDocument();
+                if (workbook.DefinedNames != null)
+                {
+                    var definedNames = new DocumentFormat.OpenXml.Spreadsheet.DefinedNames();
+                    workbookPart.Workbook.DefinedNames = definedNames;
+                    foreach (var dn in workbook.DefinedNames)
+                    {
+                        if (dn != null)
+                        {
+                            definedNames.Append(new DocumentFormat.OpenXml.Spreadsheet.DefinedName { Name = dn.Name, Text = dn.Text });
+                        }
+                    }
+                }
             }
         }
 
@@ -469,6 +498,33 @@ namespace OpenXmlPowerTools
                             }
                         }
                         commentsPart.Comments.Save();
+                    }
+                    if (worksheetData.DataValidations != null)
+                    {
+                        partXmlWriter.WriteEndElement();
+                        partXmlWriter.WriteStartElement("dataValidations", ws);
+                        partXmlWriter.WriteStartAttribute("count");
+                        partXmlWriter.WriteValue(worksheetData.DataValidations.Count());
+                        foreach (var dv in worksheetData.DataValidations)
+                        {
+                            if (dv != null)
+                            {
+                                partXmlWriter.WriteStartElement("dataValidation", ws);
+                                partXmlWriter.WriteStartAttribute("type");
+                                partXmlWriter.WriteValue("list");
+                                partXmlWriter.WriteStartAttribute("allowBlank");
+                                partXmlWriter.WriteValue((dv.AllowBlank)? "1" : "0");
+                                partXmlWriter.WriteStartAttribute("showInputMessage");
+                                partXmlWriter.WriteValue((dv.ShowInputMessage) ? "1" : "0");
+                                partXmlWriter.WriteStartAttribute("showErrorMessage");
+                                partXmlWriter.WriteValue((dv.ShowErrorMessage) ? "1" : "0");
+                                partXmlWriter.WriteStartAttribute("sqref");
+                                partXmlWriter.WriteValue(dv.ReferenceSequence);
+                                partXmlWriter.WriteEndAttribute();
+                                partXmlWriter.WriteElementString("formula1", dv.Formula);
+                                partXmlWriter.WriteEndElement();
+                            }
+                        }
                     }
                 }
             }
