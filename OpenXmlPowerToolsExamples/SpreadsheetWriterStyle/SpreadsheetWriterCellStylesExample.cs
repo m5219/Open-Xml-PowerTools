@@ -1324,7 +1324,7 @@ namespace SpreadsheetWriterExample
                                 Type = DataValidationType.custom,
                                 AllowBlank = true,
                                 Formula1 = "=LEN(G2)=LENB(G2)",
-                                PromptTitle = "Type: textLength",
+                                PromptTitle = "Type: custom",
                                 PromptMessage = "Please enter your name (one-byte character only)",
                             },
                         },
