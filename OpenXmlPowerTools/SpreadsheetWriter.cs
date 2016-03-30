@@ -56,12 +56,20 @@ namespace OpenXmlPowerTools
     {
         public string Name;
         public string TableName;
+        public IEnumerable<FilterColumnDfn> FilterColumns;
         public IEnumerable<ColDfn> Cols;
         public IEnumerable<CellDfn> ColumnHeadings;
         public IEnumerable<RowDfn> Rows;
         public IEnumerable<CellCommentDfn> Comments;
         public Func<string, CellCommentDfn, string> CommentShapeXml;
         public IEnumerable<DataValidationDfn> DataValidations;
+    }
+
+    public class FilterColumnDfn
+    {
+        //0 start
+        public int ColId;
+        public IEnumerable<string> Filters;
     }
 
     public class DataValidationDfn
@@ -113,6 +121,7 @@ namespace OpenXmlPowerTools
     {
         public IEnumerable<CellDfn> Cells;
         public decimal? Height;
+        public bool Hidden;
     }
 
     // Value can be:
@@ -450,14 +459,27 @@ namespace OpenXmlPowerTools
                         partXmlWriter.WriteValue(rId2);
                         TableDefinitionPart tdp = worksheetPart.AddNewPart<TableDefinitionPart>(rId2);
                         XDocument tXDoc = tdp.GetXDocument();
+                        var autoFilter = new List<object>();
+                        autoFilter.Add(new XAttribute(SSNoNamespace._ref, "A1:" + SpreadsheetMLUtil.IntToColumnId(totalColumns - 1) + totalRows.ToString()));
+                        if (worksheetData.FilterColumns != null)
+                        {
+                            foreach (var filterColumn in worksheetData.FilterColumns)
+                            {
+                                autoFilter.Add(new XElement(S.filterColumn,
+                                    new XAttribute(NoNamespace.colId, filterColumn.ColId),
+                                    new XElement(S.filters,
+                                    filterColumn.Filters.Select(x =>
+                                        new XElement(S.filter,
+                                        new XAttribute(SSNoNamespace.val, x))))));
+                            }
+                        }
                         XElement table = new XElement(S.table,
                             new XAttribute(SSNoNamespace.id, 1),
                             new XAttribute(SSNoNamespace.name, worksheetData.TableName),
                             new XAttribute(SSNoNamespace.displayName, worksheetData.TableName),
                             new XAttribute(SSNoNamespace._ref, "A1:" + SpreadsheetMLUtil.IntToColumnId(totalColumns - 1) + totalRows.ToString()),
                             new XAttribute(SSNoNamespace.totalsRowShown, 0),
-                            new XElement(S.autoFilter,
-                                new XAttribute(SSNoNamespace._ref, "A1:" + SpreadsheetMLUtil.IntToColumnId(totalColumns - 1) + totalRows.ToString())),
+                            new XElement(S.autoFilter, autoFilter.ToArray()),
                             new XElement(S.tableColumns,
                                 new XAttribute(SSNoNamespace.count, totalColumns),
                                 worksheetData.ColumnHeadings.Select((ch, i) =>
@@ -809,7 +831,13 @@ namespace OpenXmlPowerTools
             xw.WriteStartAttribute("spans");
             xw.WriteValue("1:" + row.Cells.Count().ToString());
             xw.WriteEndAttribute();
-            if (row != null && row.Height != null)
+            if (row.Hidden)
+            {
+                xw.WriteStartAttribute("hidden");
+                xw.WriteValue(1);
+                xw.WriteEndAttribute();
+            }
+            if (row.Height != null)
             {
                 xw.WriteStartAttribute("ht");
                 xw.WriteValue(row.Height);

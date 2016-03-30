@@ -32,6 +32,9 @@ namespace SpreadsheetWriterExample
             // Comment
             CommentExample(tempDi);
 
+            // Table,Filter
+            TableAndFilterExample(tempDi);
+
             // row / column styles
             RowHeightExample(tempDi);
             ColWidthExample(tempDi);
@@ -1505,6 +1508,140 @@ namespace SpreadsheetWriterExample
                 }
             };
             SpreadsheetWriter.Write(Path.Combine(dir.FullName, "CommentExample.xlsx"), wb);
+        }
+
+        static void TableAndFilterExample(DirectoryInfo dir)
+        {
+            WorkbookDfn wb = new WorkbookDfn
+            {
+                Worksheets = new WorksheetDfn[]
+                {
+                    new WorksheetDfn
+                    {
+                        Name = "TableAndFilter",
+                        TableName = "Presidents",
+                        ColumnHeadings = new CellDfn[]
+                        {
+                            new CellDfn
+                            {
+                                Value = "Name",
+                            },
+                            new CellDfn
+                            {
+                                Value = "Number",
+                            },
+                        },
+                        FilterColumns = new FilterColumnDfn[]
+                        {
+                            new FilterColumnDfn
+                            {
+                                ColId = 0,
+                                //NOTICE:You must do this filter processing
+                                Filters = new[] { "Bush", "Obama" },
+                            },
+                        },
+                        Rows = new RowDfn[]
+                        {
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Bush",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "51",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                //hide by filter results
+                                Hidden = true,
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Clinton",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "52",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                //hide by filter results
+                                Hidden = true,
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Clinton",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "53",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Bush",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "54",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Bush",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "55",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Obama",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "56",
+                                    },
+                                },
+                            },
+                            new RowDfn
+                            {
+                                Cells = new CellDfn[]
+                                {
+                                    new CellDfn {
+                                        Value = "Obama",
+                                    },
+                                    new CellDfn {
+                                        CellDataType = CellDataType.Number,
+                                        Value = "57",
+                                    },
+                                },
+                            },
+                        },
+                    }
+                }
+            };
+            SpreadsheetWriter.Write(Path.Combine(dir.FullName, "TableAndFilterExample.xlsx"), wb);
         }
 
         static void RowHeightExample(DirectoryInfo dir)
